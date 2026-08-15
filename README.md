@@ -32,11 +32,12 @@ Copy-Item -Recurse .\preset\preset $target
 | 路径 | 仓库 | 版本 | 作用 |
 |---|---|---|---|
 | `injector/` | [dsh-super-injector](https://github.com/yjh051108/dsh-super-injector) | [v0.3.3](https://github.com/yjh051108/dsh-super-injector/releases/tag/v0.3.3) | 运行时注入器：dev_* 工具全家桶（注入/热重载/侧挂转正/卸载/路由自愈） |
-| `preset/` | [dsh-router-standard](https://github.com/yjh051108/dsh-router-standard) | [v0.1.1](https://github.com/yjh051108/dsh-router-standard/releases/tag/v0.1.1) | 思维模式路由预设：spec/react/weak 三模式 + 近距离引导 + 单任务三锚 |
+| `preset/` | [dsh-router-standard](https://github.com/yjh051108/dsh-router-standard) | [v0.3.0](https://github.com/yjh051108/dsh-router-standard/releases/tag/v0.3.0) | 思维模式路由预设：router-standard（RL 接口还原）/ router-spec（深度思考优先）/ router-pro（Pro 测量最优） |
+| `mode-boost/` | [dsh-mode-boost](https://github.com/yjh051108/dsh-mode-boost) | [v0.1.0](https://github.com/yjh051108/dsh-mode-boost/releases/tag/v0.1.0) | 模式提升插件：deep-persona 收敛提升 / boost 重分类引导 / 深度自适应分派（宿主平面，装配在官方 preset 之上） |
 
 > 版本号以各组件仓库的 git tag 为准（列内链接直达对应 Release）。
 
-两个组件独立演进（submodule 指向各自 main），套装聚合安装链与总览。
+三个组件独立演进（submodule 指向各自 main），套装聚合安装链与总览。
 
 ## router-standard 预设能力（P1-P23 实测摘要）
 
