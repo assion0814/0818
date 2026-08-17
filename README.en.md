@@ -40,11 +40,10 @@ Copy-Item -Recurse .\preset\preset\router-spec $target
 |---|---|---|---|
 | `injector/` | [dsh-super-injector](https://github.com/yjh051108/dsh-super-injector) | [v0.3.3](https://github.com/yjh051108/dsh-super-injector/releases/tag/v0.3.3) | Runtime injector: dev_* tool family (inject / hot-reload / staging-promote / uninject / route self-heal) |
 | `preset/` | [dsh-router-standard](https://github.com/yjh051108/dsh-router-standard) | [v0.3.0](https://github.com/yjh051108/dsh-router-standard/releases/tag/v0.3.0) | Reasoning-mode routing presets: router-standard (RL-interface restoration) / router-spec (deep-think-first) / router-pro (V4 Pro measured optimum) |
-| `mode-boost/` | [dsh-mode-boost](https://github.com/yjh051108/dsh-mode-boost) | [v0.1.0](https://github.com/yjh051108/dsh-mode-boost/releases/tag/v0.1.0) | Mode-boost plugin: deep-persona convergence lift / boost reclassification guidance / depth-adaptive dispatch (host-plane, mounts on top of official presets) |
 
 > Versions follow each component repo's git tag (links go to the matching Release).
 
-The three components evolve independently (submodules point at each repo's
+The two components evolve independently (submodules point at each repo's
 `main`); the suite aggregates the install chain and the overview.
 
 ## router-standard preset capabilities (P1–P23 measured summary)
@@ -71,3 +70,4 @@ The three components evolve independently (submodules point at each repo's
 ## License
 
 MIT. Credits: xiaobright/modeltest (V4.1b evaluation), xiaobright/dsh-anchored-standard (anchoring mechanism).
+
