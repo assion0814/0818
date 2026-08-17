@@ -4,6 +4,3 @@
 [submodule "preset"]
 	path = preset
 	url = https://github.com/yjh051108/dsh-router-standard.git
-[submodule "mode-boost"]
-	path = mode-boost
-	url = https://github.com/yjh051108/dsh-mode-boost.git
