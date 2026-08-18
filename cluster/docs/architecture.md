@@ -82,10 +82,11 @@ cluster/
 │   ├── cli.py               # aikube CLI + 单机进程编排（kubeadm/kubectl 合体）
 │   ├── apiserver.py         # ai-apiserver（REST + cni 路由表 + 领域模型 Api）
 │   ├── state.py             # ai-etcd（JSONL-WAL KV 存储 + HTTP）
-│   ├── scheduler.py         # ai-scheduler（分类/Filter/Score/Bind）
+│   ├── scheduler.py         # ai-scheduler（分类/Filter/Score/Bind + 工具覆盖）
 │   ├── controller.py        # ai-controller-manager（健康/驱逐/副本）
-│   ├── kubelet.py           # ai-kubelet（注册/心跳/执行）
+│   ├── kubelet.py           # ai-kubelet（注册/心跳/沙箱执行）
 │   ├── runtime.py           # ai-runtime（mock / OpenAI 兼容）
+│   ├── tools.py             # 工具注册表 + 模式→工具映射 + ToolSandbox 最小权限
 │   └── util.py              # 配置/端口/日志/HTTP 客户端
 ├── scripts/
 │   ├── install.sh           # 安装到 ~/.local/bin
@@ -103,3 +104,6 @@ cluster/
 - **调度决策落盘**：每个 Pod 的 `decision` 字段完整记录分类/过滤/打分，`describe` 可审计。
 - **LLM 可插拔**：分类与执行都可接 OpenAI 兼容端点（ollama 默认 11434）；无 LLM 时
   规则分类 + mock 执行，全链路离线可跑。
+- **工具最小权限**：控制面 API 面固定 14 个管理端点（无执行端点，/exec 类 404）；
+  执行面节点工具白名单由能力推导最小集，调度器做工具覆盖过滤，节点侧 ToolSandbox
+  拒绝越权并留痕（`aikube get tools` 查看矩阵）。

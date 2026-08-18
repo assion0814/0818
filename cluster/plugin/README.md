@@ -41,9 +41,10 @@ pnpm dsh-test --config dsh-testkit.yaml
 # 产物：.dsh-testkit/runs/<run>/report.{json,md} + junit.xml + 阶段证据
 ```
 
-本机实测（2026-08-18，run `20260818161052-5d9eb334`）：**verdict passed**，
-11 个生命周期阶段全绿（resolve/install-dsh/package/install-plugin/assemble/boot/
-register/exercise/uninstall/reboot/cleanup），完整证据见 [evidence/](evidence/)。
+本机实测（2026-08-18）：**verdict passed** 两轮——
+`20260818161052-5d9eb334`（v0.1.0 基线）与 `20260818165208-998d550f`（工具最小权限版：
+控制面 API 面无执行端点 + 节点工具白名单 + 调度器工具覆盖过滤 + ToolSandbox 越权拒绝）。
+完整证据见 [evidence/](evidence/)。
 
 实测踩坑（复现时注意）：
 1. **镜像源**：本机 Docker 的 USTC mirror 已失效 → 改用官方支持的 local runner：

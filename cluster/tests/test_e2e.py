@@ -136,6 +136,90 @@ class TestE2E(unittest.TestCase):
         self.assertEqual(len(pods), 2)
         self.assertTrue(all(p["phase"] == "Succeeded" for p in pods))
 
+    # ------------------------------------------------------ 工具最小权限
+    def test_e2e4_tool_filter_routing(self):
+        """工具覆盖过滤：spec 任务显式请求 code_exec → 只路由到有该工具的节点。"""
+        from aikube.util import http, load_kubeconfig
+        cfg = load_kubeconfig()
+        # 前序测试可能杀掉过 kubelet：先复活全部节点（幂等）
+        run_cli("cluster", "start")
+        time.sleep(4)
+        task = self._submit("编写代码修复方案", "--mode", "spec", "--tools",
+                            "code_exec")
+        pod_name = f"{task}-01"
+        pod = self._wait_pod_phase(pod_name, {"Succeeded", "Failed"}, 40)
+        self.assertEqual(pod["phase"], "Succeeded", pod)
+        # master(计划型) 无 code_exec → 被工具过滤，路由到 node2
+        self.assertEqual(pod["node"], "k8s-node2", pod)
+        dec = pod["decision"]
+        self.assertEqual(dec["tools_required"], ["code_exec"])
+        self.assertEqual(dec["tools_allowed"], ["code_exec"])
+        self.assertTrue(any("工具不足" in why for why in dec["filtered"].values()),
+                        dec["filtered"])
+
+    def test_e2e5_tool_denial_trace(self):
+        """越权工具拒绝留痕：手工绑定到无 file_write 的节点，沙箱拒绝并记录事件。"""
+        from aikube.util import http, load_kubeconfig
+        cfg = load_kubeconfig()
+        api = cfg["server"]
+        tok = cfg["token"]
+        # 1. cordon 全部节点，防止调度器抢走 Pod
+        for n in http("GET", f"{api}/api/v1/nodes", token=tok)["items"]:
+            http("POST", f"{api}/api/v1/nodes/{n}/cordon",
+                 {"schedulable": False}, token=tok)
+        # 2. 提交 react 任务，显式请求 file_write（node1 白名单没有）
+        r = http("POST", f"{api}/api/v1/tasks",
+                 {"text": "执行修复任务", "mode": "react",
+                  "tools": ["file_write", "code_exec"]}, token=tok)
+        task = r["task"]["name"]
+        pod_name = f"{task}-01"
+        # 3. 手工绑定到 k8s-node1（绕过调度器，模拟陈旧绑定）
+        http("POST", f"{api}/api/v1/pods/{pod_name}/bind",
+             {"node": "k8s-node1", "decision": {"winner": "k8s-node1",
+                                                "scores": {}, "filtered": {},
+                                                "tools_required": ["file_write",
+                                                                   "code_exec"]}},
+             token=tok)
+        pod = self._wait_pod_phase(pod_name, {"Succeeded", "Failed"}, 40)
+        self.assertEqual(pod["phase"], "Succeeded", pod)
+        # 绑定兜底：tools_allowed = 请求 ∩ 节点白名单 = 仅 code_exec
+        self.assertEqual(pod["tools_allowed"], ["code_exec"])
+        # 沙箱拒绝留痕：事件 + 输出
+        events = [e["what"] for e in pod["events"]]
+        self.assertTrue(any("tool.file_write 拒绝" in e for e in events), events)
+        self.assertIn("越权拒绝", pod["output"])
+        tool_log = pod.get("tool_log", [])
+        denied = [t for t in tool_log if not t["allowed"]]
+        self.assertEqual([t["tool"] for t in denied], ["file_write"])
+        # 4. 恢复可调度
+        for n in http("GET", f"{api}/api/v1/nodes", token=tok)["items"]:
+            http("POST", f"{api}/api/v1/nodes/{n}/cordon",
+                 {"schedulable": True}, token=tok)
+
+    def test_e2e6_role_gate_and_tool_matrix(self):
+        """角色门控：worker 拒绝管理命令；get tools 展示控制面/执行面工具矩阵。"""
+        import subprocess as sp
+        r = sp.run([sys.executable, "-m", "aikube", "--role", "worker",
+                    "run", "越权任务"], capture_output=True, text=True,
+                   timeout=30, env={**os.environ, "AIKUBE_HOME": str(E2E_HOME),
+                                    "PYTHONPATH": str(ROOT)}, cwd=ROOT)
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("禁止命令", r.stderr)
+        # worker 允许执行面工具：get pods
+        r2 = sp.run([sys.executable, "-m", "aikube", "--role", "worker",
+                     "get", "pods"], capture_output=True, text=True,
+                    timeout=30, env={**os.environ, "AIKUBE_HOME": str(E2E_HOME),
+                                     "PYTHONPATH": str(ROOT)}, cwd=ROOT)
+        self.assertEqual(r2.returncode, 0, r2.stderr)
+        self.assertIn("POD", r2.stdout)
+        # 工具矩阵
+        r3 = run_cli("get", "tools")
+        self.assertEqual(r3.returncode, 0, r3.stderr)
+        self.assertIn("控制面 API 面", r3.stdout)
+        self.assertIn("节点工具白名单", r3.stdout)
+        self.assertIn("k8s-node1", r3.stdout)
+        self.assertIn("code_exec", r3.stdout)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

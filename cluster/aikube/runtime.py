@@ -20,9 +20,24 @@ MOCK_OUTPUTS = {
 
 MODEL_MOCK_NAMES = {"pro": "mock-pro", "flash": "mock-flash"}
 
+# 每个工具的默认调用参数（确定性 exercise）
+DEFAULT_TOOL_ARGS = {
+    "file_read": {"path": "notes.txt"},
+    "file_write": {"path": "notes.txt", "content": "AI 集群任务笔记"},
+    "math_calc": {"expr": "2+3*4"},
+    "classify_text": {},
+    "summarize_text": {},
+    "web_fetch": {"url": "https://example.com/docs"},
+    "code_exec": {"code": "print('ok')"},
+}
+
 
 class Runtime:
-    """执行器：kubelet 调用 run() 执行一个 Pod。"""
+    """执行器：kubelet 调用 run() 执行一个 Pod。
+
+    sandbox 非空时，Pod 的工具调用在 ToolSandbox 内执行（最小权限：
+    只放行 tools_allowed，越权工具返回拒绝并留痕）。
+    """
 
     def __init__(self, kind: str = "mock", llm_url: str | None = None,
                  model: str | None = None, llm_api_key: str | None = None,
@@ -35,7 +50,7 @@ class Runtime:
         self.jitter_ms = jitter_ms
 
     # ------------------------------------------------------------- 模拟执行
-    def _mock_run(self, pod: dict) -> tuple[str, float]:
+    def _mock_run(self, pod: dict, sandbox=None) -> tuple[str, float, list]:
         text = pod.get("text", "")          # pod 自带任务文本
         mode = pod.get("mode", "weak")
         size = pod.get("size", "small")
@@ -45,7 +60,22 @@ class Runtime:
         cost = round(time.time() - t0, 2)
         summary = text[:60] + ("…" if len(text) > 60 else "")
         out = f"[mock-{self.model}] {MOCK_OUTPUTS.get(mode, MOCK_OUTPUTS['weak'])} 任务: {summary}"
-        return out, cost
+        tool_log: list = []
+        if sandbox is not None:
+            # 尝试执行：显式请求优先，否则尝试调度器批准的模式默认工具集
+            requested = sorted(set(pod.get("tools_requested") or
+                                   pod.get("tools_allowed") or []))
+            for tool in requested:
+                args = dict(DEFAULT_TOOL_ARGS.get(tool, {}))
+                if tool in ("classify_text", "summarize_text"):
+                    args["text"] = text
+                tool_log.append(sandbox.exec(tool, args))
+            allowed = sum(1 for e in tool_log if e["allowed"])
+            denied = [e["tool"] for e in tool_log if not e["allowed"]]
+            out += f" 工具调用: 放行 {allowed}/{len(tool_log)}"
+            if denied:
+                out += f"，越权拒绝 {denied}"
+        return out, cost, tool_log
 
     # ------------------------------------------------------- OpenAI 兼容执行
     def _openai_run(self, pod: dict) -> tuple[str, float]:
@@ -77,7 +107,8 @@ class Runtime:
         except (error.URLError, KeyError, IndexError, json.JSONDecodeError) as e:
             raise RuntimeError(f"LLM 执行失败: {e}") from None
 
-    def run(self, pod: dict) -> tuple[str, float]:
+    def run(self, pod: dict, sandbox=None) -> tuple[str, float, list]:
         if self.kind == "openai":
-            return self._openai_run(pod)
-        return self._mock_run(pod)
+            out, cost = self._openai_run(pod)
+            return out, cost, []
+        return self._mock_run(pod, sandbox)

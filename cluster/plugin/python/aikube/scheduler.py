@@ -17,6 +17,7 @@ import time
 from urllib import request, error
 
 from .util import http, log, free_port, api_url
+from .tools import MODE_TOOLS, TOOL_REGISTRY
 
 WEIGHTS = {"load": 0.40, "capability": 0.30, "affinity": 0.20, "latency": 0.10}
 
@@ -147,6 +148,7 @@ class Scheduler:
 
         # 4. Bind（同分时：负载更低者优先 —— 确定性决策）
         best = max(scores, key=lambda n: (scores[n]["total"], -scores[n]["load"]))
+        required = self._required_tools(pod)
         decision = {
             "time": time.time(),
             "filtered": pod.get("filtered", {}),
@@ -154,7 +156,10 @@ class Scheduler:
             "winner": best,
             "weights": WEIGHTS,
             "classification": pod.get("classification"),
-            "strategy": "AI 加权调度 (负载40/能力30/亲和20/延迟10)",
+            "tools_required": required,
+            "tools_allowed": sorted(set(required) &
+                                    set(self.api.nodes()[best].get("tools", []))),
+            "strategy": "AI 加权调度 (负载40/能力30/亲和20/延迟10) + 工具最小权限",
         }
         log("ai-scheduler",
             f"{pod['name']} [{pod['mode']}] -> {best} "
@@ -164,6 +169,14 @@ class Scheduler:
         return True
 
     # --------------------------------------------------------- Filter 规则
+    @staticmethod
+    def _required_tools(pod: dict) -> list[str]:
+        """任务所需工具：显式请求优先，否则按 AI 分类的模式默认集。"""
+        requested = pod.get("tools_requested") or []
+        if requested:
+            return sorted(set(requested))
+        return MODE_TOOLS.get(pod.get("mode", "react"), MODE_TOOLS["react"])
+
     def _filter(self, name: str, node: dict, pod: dict) -> str | None:
         if not node.get("ready"):
             return f"NotReady"
@@ -180,6 +193,12 @@ class Scheduler:
         node_caps = set(node.get("capabilities", []))
         if not node_caps.intersection(need):
             return f"能力不足(需{need})"
+        # 工具最小权限：节点白名单须覆盖任务所需全部工具
+        node_tools = set(node.get("tools") or [])
+        required = self._required_tools(pod)
+        missing = [t for t in required if t not in node_tools]
+        if missing:
+            return f"工具不足(缺 {', '.join(missing)})"
         return None
 
     # --------------------------------------------------------- Score 评分

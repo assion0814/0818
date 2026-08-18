@@ -56,10 +56,42 @@ k8s-node2   total=0.94 (load=1.00 cap=1.00 aff=0.70 lat=1.00)
 - Api 领域模型：节点注册/心跳、任务拆 Pod、bind 幂等、驱逐→requeue
 - HTTP 层：join token 不匹配 403
 
+## P5 工具最小权限（单元 32/32 + e2e 6/6 通过）✅
+
+**单元测试（test_tools.py，14 例）**：
+- ToolSandbox：放行/拒绝、Pod 工作区隔离（p1 写的文件 p2 读不到）、
+  路径越界拒绝且不泄露内容、safe_calc 拒绝任意代码
+- 模式→工具映射：code_exec 永不属于 spec，file_write 永不属于 react
+- 节点默认白名单最小集：纯执行节点无 file_write，纯计划节点无 code_exec
+- 调度器工具过滤：有能力但缺工具的节点被淘汰（"工具不足(缺 …)"）；
+  显式 --tools 请求强制执行；decision 记录 tools_required/tools_allowed
+- CLI 角色门控：worker 拒绝 run/cluster/node/token/delete/get nodes/tasks
+- 控制面 API 面：/exec /shell /run 全部 404（含通用分支防绕过）
+
+**端到端（test_e2e.py E2E-4/5/6）**：
+- E2E-4 工具过滤路由：spec 任务 --tools code_exec → master 被"工具不足"过滤
+  → 路由到 node2，tools_allowed=[code_exec] ✅
+- E2E-5 越权拒绝留痕：手工把 react 任务（请求 file_write）绑定到无 file_write
+  的 node1 → 沙箱拒绝 → Pod 事件 `tool.file_write 拒绝` + 输出"越权拒绝" ✅
+- E2E-6 角色门控：worker 角色 run 报"禁止命令"退出 1；get pods 放行；
+  get tools 输出控制面 API 面 + 节点白名单矩阵 ✅
+
+**实测拓扑（get tools 输出）**：
+
+```
+k8s-master   [mock-pro  ] classify_text, file_read, file_write, math_calc, summarize_text
+k8s-node1    [mock-flash] classify_text, code_exec, file_read, math_calc, summarize_text, web_fetch
+k8s-node2    [mock-pro  ] code_exec, file_read, file_write, math_calc, web_fetch
+```
+
+缺陷记录：首版 bind 只按显式 tools_requested 授权，未显式请求的任务
+tools_allowed 为空（模式推导集未批准）——改为 `requested ∪ decision.tools_required`
+后修复；运行时同步改为尝试已批准集，pods 表 TOOLS 列可见真实授权。
+
 ## 复现
 
 ```bash
 cd cluster
-python3 -m unittest discover -s tests -v   # P4
-python3 -m unittest tests.test_e2e -v      # P1-P3（约 40s）
+python3 -m unittest discover -s tests -v   # P4/P5 单元（32 例）
+python3 -m unittest tests.test_e2e -v      # P1-P3 + P5 端到端（6 例，约 50s）
 ```

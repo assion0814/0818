@@ -6,6 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from aikube.scheduler import Classifier, Scheduler, MODE_CAPABILITY  # noqa: E402
+from aikube.tools import MODE_TOOLS, default_node_tools  # noqa: E402
 
 
 class TestClassifier(unittest.TestCase):
@@ -60,15 +61,18 @@ class FakeApi:
 
 
 def node(name, model, caps, slots=2, labels=None, ready=True, schedulable=True,
-         queue=0, latency=0.0):
+         queue=0, latency=0.0, tools=None):
     return {"name": name, "model": model, "capabilities": caps, "slots": slots,
             "labels": labels or {}, "ready": ready, "schedulable": schedulable,
-            "queue": queue, "latency_ms": latency}
+            "queue": queue, "latency_ms": latency,
+            "tools": tools if tools is not None else default_node_tools(caps)}
 
 
-def pod(name, mode="react", affinity=None, text="执行任务"):
+def pod(name, mode="react", affinity=None, text="执行任务", tools=None):
     return {"name": name, "mode": mode, "affinity": affinity or {},
-            "text": text, "phase": "Pending", "node": None}
+            "text": text, "phase": "Pending", "node": None,
+            "tools_requested": tools if tools is not None else MODE_TOOLS.get(mode, []),
+            "tools_allowed": None}
 
 
 class TestScheduler(unittest.TestCase):

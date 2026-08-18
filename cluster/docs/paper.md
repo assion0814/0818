@@ -81,7 +81,54 @@ total = Σ wᵢ·scoreᵢ
 关键不变量：**heartbeat 时间戳只由 kubelet 写入**，控制器只翻转 ready 标志——
 避免"控制器自己刷新心跳导致节点永不过期"的经典 bug。
 
-## 6. 正确性讨论
+## 6. 工具最小权限（Tool Least-Privilege，v0.1 新增）
+
+对齐 k8s RBAC 的"控制面瘦身 + 工作节点按需授工具"：
+
+### 6.1 工具注册表与模式映射（tools.py）
+
+- 工具注册表 `TOOL_REGISTRY`：7 个确定性工具（file_read/file_write/math_calc/
+  classify_text/summarize_text/web_fetch/code_exec），每个标注所需能力 caps。
+- 模式 → 工具映射 `MODE_TOOLS`：AI 分类结果决定任务所需工具集——
+  spec={file_read, file_write, math_calc}（计划类）、react={code_exec, web_fetch,
+  math_calc}（执行类）、mixed=并集、weak={classify_text, summarize_text}。
+  执行类工具（code_exec/web_fetch）**永不**出现在计划类模式中，反之亦然。
+- 节点默认白名单 `default_node_tools(capabilities)`：由能力推导的最小集——
+  纯执行节点无 file_write，纯计划节点无 code_exec。
+
+### 6.2 控制面（极少工具）
+
+- API 面固定为 14 个管理端点（CONTROL_PLANE_API），**无任何执行端点**；
+  `/exec`、`/shell`、`/run` 显式禁止（FORBIDDEN_API 404），通用 PUT 分支用
+  `fullmatch` 只匹配单段资源路径，杜绝绕过。
+- CLI 角色门控：`--role control-plane`（默认）持全部管理命令；
+  `--role worker` 只保留 `get pods` / `logs`（与任务执行相关的工具），
+  其余命令（run/cluster/node/token/delete/get nodes…）一律拒绝。
+
+### 6.3 执行面（每节点限制工具）
+
+1. **调度 Filter 增加工具覆盖**：`required = 显式请求 ∪ MODE_TOOLS[mode]`，
+   节点白名单须覆盖全部所需工具，否则淘汰（"工具不足(缺 …)"）。
+2. **Bind 双重收紧**：`tools_allowed = required ∩ 节点白名单`，写入 Pod 与
+   decision（可审计）。
+3. **节点侧 ToolSandbox**：kubelet 为每个 Pod 建独立工作区 + 只放行
+   `tools_allowed` 的沙箱；越权工具调用返回拒绝并写入 Pod 事件
+   （`tool.<name> 拒绝`），`describe`/`logs` 可追溯。
+4. **留痕闭环**：工具调用日志（放行/拒绝 + 结果）经 `/api/v1/pods/<n>/tools`
+   上报持久化。
+
+### 6.4 最小权限拓扑（默认 1 主 2 从）
+
+| 节点 | 能力 | 工具白名单（推导） | 缺什么 |
+|---|---|---|---|
+| k8s-master | plan,spec,classify | file_read,file_write,math_calc,classify_text,summarize_text | code_exec,web_fetch |
+| k8s-node1 | execute,react,classify | file_read,math_calc,classify_text,summarize_text,web_fetch,code_exec | file_write |
+| k8s-node2 | plan,spec,execute | file_read,file_write,math_calc,web_fetch,code_exec | classify 类 |
+
+→ spec 任务只能在 master/node2；react 任务只能在 node1/node2；mixed 只能在 node2；
+显式请求 code_exec 的 spec 任务被 master 工具过滤。
+
+## 7. 正确性讨论
 
 - **无死锁**：Pending Pod 要么被绑定，要么因无候选节点滞留（可观测：filtered 原因落盘）。
 - **幂等**：bind/evict/status 均检查当前 phase，重复调用不产生副作用。

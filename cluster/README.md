@@ -40,6 +40,17 @@ python3 -m aikube run "用 GPU 训练图像识别模型" --affinity gpu=true  # 
 python3 -m aikube describe <pod名>
 python3 -m aikube logs <pod名>
 
+# 4b. 工具最小权限矩阵（控制面 API 面 + 各节点工具白名单）
+python3 -m aikube get tools
+
+# 4c. 执行面角色门控：worker 只保留任务执行相关命令（get pods / logs）
+AIKUBE_ROLE=worker aikube run "越权任务"    # → 拒绝：执行面角色禁止命令
+AIKUBE_ROLE=worker aikube get pods          # → 放行
+
+# 4d. 任务显式请求工具：调度器按工具覆盖过滤节点，越权调用被沙箱拒绝并留痕
+python3 -m aikube run "写代码修复" --tools code_exec   # 只会路由到有 code_exec 的节点
+python3 -m aikube describe <pod名>                     # 工具: 请求/授权 + 调用留痕
+
 # 5. 节点维护与故障自愈
 python3 -m aikube node cordon k8s-node1   # 节点不可调度
 python3 -m aikube node drain k8s-node1    # cordon + 驱逐，Pod 自动重调度
@@ -72,6 +83,10 @@ python3 -m aikube cluster start
   mixed=陷阱回避 / weak=模型自分类），Pro 节点吃 spec，Flash 节点吃 react。
 - **打分透明**：每个 Pod 的 `describe` 输出全部候选节点的 load/capability/affinity/latency
   分项与总分、被过滤原因、AI 分类置信度——调度决策可审计。
+- **工具最小权限**（k8s RBAC 类比）：控制面只暴露 14 个管理端点（无执行端点，`/exec` 类
+  404），CLI 分角色（`--role worker` 只保留 get pods/logs）；执行面每个节点按能力推导
+  工具白名单最小集，任务的 AI 分类推导所需工具，调度器做工具覆盖过滤，节点侧
+  ToolSandbox 拒绝越权调用并写入 Pod 事件（`aikube get tools` 查看矩阵）。
 - **自愈闭环**：控制器 10s 心跳超时 → NotReady → 驱逐 Pod → requeue → 调度器重绑定到
   健康节点；`replicas` 副本由控制器保持（Deployment 控制器类比）。
 
@@ -89,6 +104,8 @@ cluster 组件以原生 DSH 插件形态（[plugin/](plugin/)）通过
 的真实宿主生命周期测试：在精确 DSH `0.1.0-rc.6` 中完成 install → boot → register
 （service `aikubeCluster` + tool `aikube`）→ exercise（真实拉起 1 主 2 从集群、
 spec/react 任务全部 Succeeded）→ uninstall → reboot → cleanup，**verdict passed**。
+已连续验证两版：v0.1.0 基线与工具最小权限版（控制面 API 面无执行端点、节点工具
+白名单、调度器工具覆盖过滤、ToolSandbox 越权拒绝留痕）。
 
 - 门禁场景与复现：[plugin/README.md](plugin/README.md)
 - 完整证据（report.json/md + junit + probe）：[plugin/evidence/](plugin/evidence/)

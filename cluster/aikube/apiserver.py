@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import json
 import secrets
 import time
@@ -18,6 +19,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
 
 from .util import http, log, free_port, etcd_path, api_url, APIError
+from .tools import default_node_tools
 
 DEFAULT_PORT = 16443
 ETCD_PORT = 12379
@@ -27,6 +29,26 @@ MODES = ("auto", "spec", "react", "mixed", "weak")
 PHASES = ("Pending", "Scheduled", "Running", "Succeeded", "Failed", "Evicted")
 
 NODE_ROLES = {"master": "master", "worker": "worker"}
+
+# 控制面 API 面：只保留集群管理端点（无任何任务执行/任意代码端点）
+CONTROL_PLANE_API = [
+    "GET  /healthz",
+    "POST /api/v1/nodes                    节点注册（join token 校验）",
+    "POST /api/v1/nodes/<name>/heartbeat   心跳上报",
+    "POST /api/v1/nodes/<name>/cordon      cordon/uncordon",
+    "GET  /api/v1/nodes[ /<name>]          节点查询",
+    "POST /api/v1/tasks                    任务提交（拆分为 Pod）",
+    "GET  /api/v1/tasks[ /<name>]          任务查询",
+    "GET  /api/v1/pods[?node&phase]        Pod 查询",
+    "POST /api/v1/pods/<name>/bind         调度器绑定",
+    "POST /api/v1/pods/<name>/status       kubelet 状态上报",
+    "POST /api/v1/pods/<name>/tools        工具调用留痕",
+    "POST /api/v1/pods/<name>/evict        驱逐",
+    "POST /api/v1/pods/<name>/requeue      重调度回队",
+    "PUT/DELETE /api/v1/{nodes,pods,tasks}/<name>  组件内状态同步",
+]
+# 显式禁止面：控制面绝不提供任务执行类端点（/exec、/run、/shell）
+FORBIDDEN_API = ("/exec", "/shell", "/run")
 
 
 class Cni:
@@ -120,11 +142,14 @@ class Api:
         return self._get(f"/nodes/{name}")
 
     def register_node(self, name: str, profile: dict, token: str) -> dict:
+        caps = profile.get("capabilities", ["execute"])
         node = {
             "name": name,
             "role": profile.get("role", "worker"),
             "model": profile.get("model", "mock-flash"),
-            "capabilities": profile.get("capabilities", ["execute"]),
+            "capabilities": caps,
+            # 工具最小权限：显式白名单优先，否则由能力推导最小集
+            "tools": sorted(profile.get("tools") or default_node_tools(caps)),
             "slots": profile.get("slots", 2),
             "labels": profile.get("labels", {}),
             "runtime": profile.get("runtime", "mock"),
@@ -187,6 +212,8 @@ class Api:
             "size": task.get("size", "small"),
             "affinity": task.get("affinity", {}),
             "text": task.get("text", ""),
+            "tools_requested": task.get("tools_requested", []),
+            "tools_allowed": None,
             "phase": "Pending",
             "node": None,
             "created": time.time(),
@@ -205,6 +232,7 @@ class Api:
     # ------------------------------------------------------------- 任务/Pod
     def create_task(self, spec: dict, token: str) -> dict:
         task_id = spec.get("name") or "task-" + uuid.uuid4().hex[:8]
+        requested = sorted(set(spec.get("tools") or []))
         task = {
             "name": task_id,
             "text": spec["text"],
@@ -212,6 +240,7 @@ class Api:
             "replicas": int(spec.get("replicas", 1)),
             "affinity": spec.get("affinity", {}),
             "size": spec.get("size", "small"),
+            "tools_requested": requested,
             "created": time.time(),
             "owner": token[:8],
         }
@@ -224,6 +253,8 @@ class Api:
                 "size": task["size"],
                 "affinity": task["affinity"],
                 "text": task["text"],
+                "tools_requested": requested,
+                "tools_allowed": None,   # 调度器绑定后填充
                 "phase": "Pending",
                 "node": None,
                 "created": time.time(),
@@ -269,8 +300,32 @@ class Api:
             return None
         pod["phase"] = "Scheduled"
         pod["node"] = node
+        # 工具最小权限：只批准节点白名单 ∩ 任务所需工具。
+        # 任务所需 = 显式请求 ∪ 调度器按 AI 分类推导的模式默认集（decision.tools_required）
+        node_obj = self.node(node) or {}
+        whitelist = set(node_obj.get("tools", []))
+        requested = set(pod.get("tools_requested", []))
+        if not requested:
+            requested = set((decision or {}).get("tools_required", []))
+        allowed = sorted(requested & whitelist)
+        pod["tools_allowed"] = allowed
         pod["decision"] = decision
-        pod["events"].append({"t": time.time(), "what": f"bind -> {node}"})
+        pod["events"].append({"t": time.time(),
+                              "what": f"bind -> {node}, tools={allowed or 'none'}"})
+        self._put(f"/pods/{name}", pod)
+        return pod
+
+    def pod_tool_event(self, name: str, tool_log: list[dict]) -> dict | None:
+        """节点侧工具调用留痕：记录每次工具调用的放行/拒绝。"""
+        pod = self._get(f"/pods/{name}")
+        if not pod:
+            return None
+        pod["tool_log"] = tool_log
+        for entry in tool_log:
+            status = "放行" if entry.get("allowed") else "拒绝"
+            pod["events"].append({"t": time.time(),
+                                  "what": f"tool.{entry['tool']} {status}: "
+                                          f"{entry.get('result','')[:60]}"})
         self._put(f"/pods/{name}", pod)
         return pod
 
@@ -323,6 +378,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._reply(200, {"ok": True, "component": "ai-apiserver"})
         if not self._authed():
             return self._reply(401, {"error": "unauthorized"})
+        if any(f in self.path for f in FORBIDDEN_API):
+            return self._reply(404, {"error": f"forbidden: {self.path}"})
         u = urlparse(self.path)
         p = u.path
         if p == "/api/v1/nodes":
@@ -350,6 +407,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._reply(401, {"error": "unauthorized"})
         u = urlparse(self.path)
         p = u.path
+        if any(f in p for f in FORBIDDEN_API):
+            return self._reply(404, {"error": f"forbidden: {p}"})
         try:
             body = self._body()
         except Exception:
@@ -385,6 +444,11 @@ class Handler(BaseHTTPRequestHandler):
             name = p[len("/api/v1/pods/"):-len("/status")]
             pod = self.api.set_pod_phase(name, body["phase"], **body.get("extra", {}))
             return self._reply(200, {"pod": pod} if pod else {"error": "no pod"})
+        # --- 工具调用留痕（kubelet 上报 ToolSandbox 日志）
+        if p.startswith("/api/v1/pods/") and p.endswith("/tools"):
+            name = p[len("/api/v1/pods/"):-len("/tools")]
+            pod = self.api.pod_tool_event(name, body.get("tool_log", []))
+            return self._reply(200, {"pod": pod} if pod else {"error": "no pod"})
         # --- 驱逐（controller-manager）
         if p.startswith("/api/v1/pods/") and p.endswith("/evict"):
             name = p[len("/api/v1/pods/"):-len("/evict")]
@@ -394,19 +458,13 @@ class Handler(BaseHTTPRequestHandler):
             name = p[len("/api/v1/pods/"):-len("/requeue")]
             pod = self.api.requeue_pod(name)
             return self._reply(200, {"pod": pod} if pod else {"error": "requeue failed"})
-        # --- 组件通用读写（scheduler/controller 的 remote 模式）
-        if p.startswith("/api/v1/nodes/"):
-            name = p[len("/api/v1/nodes/"):]
-            self.api._put(f"/nodes/{name}", body)
-            return self._reply(200, {"node": self.api._get(f"/nodes/{name}")})
-        if p.startswith("/api/v1/pods/"):
-            name = p[len("/api/v1/pods/"):]
-            self.api._put(f"/pods/{name}", body)
-            return self._reply(200, {"pod": self.api._get(f"/pods/{name}")})
-        if p.startswith("/api/v1/tasks/"):
-            name = p[len("/api/v1/tasks/"):]
-            self.api._put(f"/tasks/{name}", body)
-            return self._reply(200, {"task": self.api._get(f"/tasks/{name}")})
+        # --- 组件通用读写（scheduler/controller 的 remote 模式；
+        #     仅匹配 /api/v1/<kind>/<name> 单段资源，杜绝 /exec 等落入）
+        m = re.fullmatch(r"/api/v1/(nodes|pods|tasks)/([^/]+)", p)
+        if m:
+            kind, name = m.group(1), m.group(2)
+            self.api._put(f"/{kind}/{name}", body)
+            return self._reply(200, {kind[:-1]: self.api._get(f"/{kind}/{name}")})
         return self._reply(404, {"error": f"not found: {p}"})
 
     def do_PUT(self):
@@ -418,18 +476,11 @@ class Handler(BaseHTTPRequestHandler):
             body = self._body()
         except Exception:
             return self._reply(400, {"error": "bad json body"})
-        if p.startswith("/api/v1/nodes/"):
-            name = p[len("/api/v1/nodes/"):]
-            self.api._put(f"/nodes/{name}", body)
-            return self._reply(200, {"node": body})
-        if p.startswith("/api/v1/pods/"):
-            name = p[len("/api/v1/pods/"):]
-            self.api._put(f"/pods/{name}", body)
-            return self._reply(200, {"pod": body})
-        if p.startswith("/api/v1/tasks/"):
-            name = p[len("/api/v1/tasks/"):]
-            self.api._put(f"/tasks/{name}", body)
-            return self._reply(200, {"task": body})
+        m = re.fullmatch(r"/api/v1/(nodes|pods|tasks)/([^/]+)", p)
+        if m:
+            kind, name = m.group(1), m.group(2)
+            self.api._put(f"/{kind}/{name}", body)
+            return self._reply(200, {kind[:-1]: body})
         return self._reply(404, {"error": f"not found: {p}"})
 
     def do_DELETE(self):
@@ -437,14 +488,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._reply(401, {"error": "unauthorized"})
         u = urlparse(self.path)
         p = u.path
-        if p.startswith("/api/v1/nodes/"):
-            self.api._delete("/nodes/" + p[len("/api/v1/nodes/"):])
-            return self._reply(200, {"deleted": True})
-        if p.startswith("/api/v1/pods/"):
-            self.api._delete("/pods/" + p[len("/api/v1/pods/"):])
-            return self._reply(200, {"deleted": True})
-        if p.startswith("/api/v1/tasks/"):
-            self.api._delete("/tasks/" + p[len("/api/v1/tasks/"):])
+        m = re.fullmatch(r"/api/v1/(nodes|pods|tasks)/([^/]+)", p)
+        if m:
+            kind, name = m.group(1), m.group(2)
+            self.api._delete(f"/{kind}/{name}")
             return self._reply(200, {"deleted": True})
         return self._reply(404, {"error": f"not found: {p}"})
 

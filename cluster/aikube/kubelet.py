@@ -11,9 +11,12 @@ from __future__ import annotations
 import argparse
 import time
 import traceback
+from pathlib import Path
+from tempfile import mkdtemp
 
 from .util import http, log
 from .runtime import Runtime
+from .tools import ToolSandbox
 
 HEARTBEAT_INTERVAL = 3.0
 POLL_INTERVAL = 1.0
@@ -65,11 +68,18 @@ class Kubelet:
         self._api(f"/api/v1/pods/{name}/status", "POST",
                   {"phase": "Running", "extra": {"started": time.time(),
                                                  "attempts": pod.get("attempts", 0) + 1}})
-        log("ai-kubelet", f"{self.name} 开始执行 {name} [{pod['mode']}]")
+        log("ai-kubelet", f"{self.name} 开始执行 {name} [{pod['mode']}] "
+                          f"tools={pod.get('tools_allowed') or 'none'}")
+        # 工具最小权限：每个 Pod 独立工作区 + 只放行 tools_allowed 的沙箱
+        workspace = Path(mkdtemp(prefix=f"aikube-pod-{name}-"))
+        sandbox = ToolSandbox(workspace, set(pod.get("tools_allowed") or []))
         try:
-            out, cost = self.runtime.run(pod)
+            out, cost, tool_log = self.runtime.run(pod, sandbox)
             self._latency.append(cost)
             self._latency = self._latency[-10:]
+            if tool_log:
+                self._api(f"/api/v1/pods/{name}/tools", "POST",
+                          {"tool_log": tool_log})
             self._api(f"/api/v1/pods/{name}/status", "POST",
                       {"phase": "Succeeded",
                        "extra": {"output": out, "cost_s": cost,

@@ -24,6 +24,7 @@ from . import __version__
 from .util import (api_url, die, free_port, home_dir, is_alive, load_cluster_conf,
                    load_kubeconfig, log, logs_dir, read_pid, rm_pid, run_dir,
                    save_cluster_conf, save_kubeconfig, write_pid, http)
+from .apiserver import CONTROL_PLANE_API
 
 PKG_DIR = Path(__file__).parent  # aikube 包目录
 CLUSTER_ROOT = PKG_DIR.parent    # 包父目录（PYTHONPATH 锚点）
@@ -219,6 +220,8 @@ def cmd_node_join(args: argparse.Namespace) -> None:
             "slots": args.slots,
             "labels": dict(kv.split("=", 1) for kv in args.labels.split(",") if "=" in kv),
             "runtime": args.runtime}
+    if args.tools:
+        prof["tools"] = [t.strip() for t in args.tools.split(",") if t.strip()]
     conf["nodes"][args.node] = prof
     save_cluster_conf(conf)
     log("aikube", f"节点 {args.node} 加入集群（{args.model}）")
@@ -266,10 +269,19 @@ def _node_mutate(node: str, what: str, payload: dict) -> None:
 
 
 # ------------------------------------------------------------ get 命令
+# 角色工具门控：执行面（worker）只保留与任务执行相关的命令，
+# 控制面（control-plane）才有全部管理工具（控制面本身无执行类命令）。
+WORKER_ALLOWED = {
+    "get": {"pods"},          # 查看本集群 Pod（执行面可观测自己执行的任务）
+    "logs": None,             # 任务输出
+}
+
 def cmd_get(args: argparse.Namespace) -> None:
     api = api_url()
     tok = load_kubeconfig().get("token", "")
     kind = args.kind
+    if kind == "tools":
+        return cmd_get_tools()
     if kind == "nodes":
         items = http("GET", f"{api}/api/v1/nodes", token=tok)["items"]
         print(f"{'NAME':<12}{'ROLE':<8}{'MODEL':<12}{'READY':<8}"
@@ -285,12 +297,13 @@ def cmd_get(args: argparse.Namespace) -> None:
         if kind == "pods":
             items = http("GET", f"{api}/api/v1/pods", token=tok)["items"]
             print(f"{'POD':<24}{'TASK':<20}{'MODE':<7}{'NODE':<12}"
-                  f"{'PHASE':<10}{'RESCHED':<8}{'COST(s)'}")
+                  f"{'PHASE':<10}{'TOOLS':<28}{'COST(s)'}")
             for p in sorted(items, key=lambda x: x["name"]):
                 cost = p.get("cost_s", "-")
+                tools = ",".join(p.get("tools_allowed") or []) or "-"
                 print(f"{p['name']:<24}{p.get('task',''):<20}{p.get('mode',''):<7}"
                       f"{str(p.get('node') or '-'):<12}{p.get('phase',''):<10}"
-                      f"{p.get('reschedule_count',0):<8}{cost}")
+                      f"{tools:<28}{cost}")
         else:
             items = http("GET", f"{api}/api/v1/tasks", token=tok)["items"]
             print(f"{'TASK':<24}{'MODE':<7}{'REPLICAS':<9}{'TEXT'}")
@@ -301,6 +314,24 @@ def cmd_get(args: argparse.Namespace) -> None:
         die(f"未知资源类型: {kind}（nodes|pods|tasks）")
 
 
+def cmd_get_tools() -> None:
+    """工具矩阵：控制面 API 面（最小集）+ 各节点工具白名单（最小权限）。"""
+    print("=== 控制面 API 面（仅管理端点，无执行端点）===")
+    for line in CONTROL_PLANE_API:
+        print("  " + line)
+    api = api_url()
+    tok = load_kubeconfig().get("token", "")
+    items = http("GET", f"{api}/api/v1/nodes", token=tok)["items"]
+    print("\n=== 节点工具白名单（执行面最小权限）===")
+    for n in sorted(items.values(), key=lambda x: x["name"]):
+        tools = ", ".join(n.get("tools", [])) or "(无)"
+        print(f"  {n['name']:<12} [{n.get('model',''):<10}] {tools}")
+    print("\n=== 模式 → 任务所需工具（AI 分类推导）===")
+    from .tools import MODE_TOOLS
+    for mode, tools in MODE_TOOLS.items():
+        print(f"  {mode:<7} {', '.join(tools)}")
+
+
 # ------------------------------------------------------------ run 命令
 def cmd_run(args: argparse.Namespace) -> None:
     api = api_url()
@@ -308,6 +339,8 @@ def cmd_run(args: argparse.Namespace) -> None:
     text = " ".join(args.text)
     spec = {"text": text, "mode": args.mode, "replicas": args.replicas,
             "size": args.size}
+    if args.tools:
+        spec["tools"] = [t.strip() for t in args.tools.split(",") if t.strip()]
     if args.affinity:
         spec["affinity"] = dict(kv.split("=", 1) for kv in args.affinity.split(",")
                                 if "=" in kv)
@@ -338,6 +371,8 @@ def cmd_describe(args: argparse.Namespace) -> None:
     print(f"Pod: {pod['name']}   任务: {pod['task']}")
     print(f"  模式: {pod['mode']}  阶段: {pod['phase']}  节点: {pod.get('node') or '-'}"
           f"  重调度: {pod.get('reschedule_count', 0)}")
+    print(f"  工具: 请求={pod.get('tools_requested') or '-'}  "
+          f"授权={pod.get('tools_allowed') or '-'}")
     cls = pod.get("classification")
     if cls:
         print(f"  AI 分类: {cls.get('mode')} (置信 {cls.get('confidence')}, "
@@ -346,6 +381,7 @@ def cmd_describe(args: argparse.Namespace) -> None:
     if dec:
         print(f"  调度策略: {dec.get('strategy')}")
         print(f"  调度时刻: {time.strftime('%H:%M:%S', time.localtime(dec.get('time', 0)))}")
+        print(f"  工具需求: {dec.get('tools_required')}  授权: {dec.get('tools_allowed')}")
         for n, s in sorted(dec.get("scores", {}).items(), key=lambda x: -x[1]["total"]):
             mark = "← 选中" if n == dec.get("winner") else ""
             print(f"    {n:<12} total={s['total']:.2f} "
@@ -401,6 +437,9 @@ def build_parser() -> argparse.ArgumentParser:
         prog="aikube",
         description="AI K8s 集群调度网络 — dsh-routing-suite/cluster 组件")
     ap.add_argument("--version", action="version", version=f"aikube {__version__}")
+    ap.add_argument("--role", choices=["control-plane", "worker"],
+                    default=os.environ.get("AIKUBE_ROLE", "control-plane"),
+                    help="工具门控角色：worker 只保留任务执行相关命令")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     # cluster
@@ -434,6 +473,8 @@ def build_parser() -> argparse.ArgumentParser:
     pj.add_argument("--slots", type=int, default=2)
     pj.add_argument("--labels", default="")
     pj.add_argument("--runtime", default="mock")
+    pj.add_argument("--tools", default="",
+                    help="节点工具白名单覆盖，如 file_read,code_exec（默认按能力推导最小集）")
     pj.set_defaults(func=cmd_node_join, kind="nodes")
     for sub_name, uncordon in (("cordon", False), ("uncordon", True)):
         pc = ns.add_parser(sub_name, help=f"{'解除' if uncordon else ''}节点不可调度")
@@ -451,7 +492,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     # get
     pg = sub.add_parser("get", help="查看资源（kubectl get）")
-    pg.add_argument("kind", choices=["nodes", "pods", "tasks"])
+    pg.add_argument("kind", choices=["nodes", "pods", "tasks", "tools"])
     pg.set_defaults(func=cmd_get)
 
     # run
@@ -462,6 +503,8 @@ def build_parser() -> argparse.ArgumentParser:
     pr.add_argument("--replicas", type=int, default=1)
     pr.add_argument("--size", choices=["small", "medium", "large"], default="small")
     pr.add_argument("--affinity", default="", help="节点标签亲和，如 gpu=true")
+    pr.add_argument("--tools", default="",
+                    help="任务显式请求的工具，如 file_read,code_exec（默认按模式推导）")
     pr.add_argument("--watch", action="store_true")
     pr.set_defaults(func=cmd_run)
 
@@ -487,6 +530,19 @@ def main(argv: list[str] | None = None) -> None:
         if "=" in m:
             k, v = m.split("=", 1)
             args.model_of[k] = v
+    # 角色工具门控：执行面节点只保留与任务执行相关的工具
+    role = getattr(args, "role", None) or os.environ.get("AIKUBE_ROLE", "control-plane")
+    if role not in ("control-plane", "worker"):
+        die(f"未知角色: {role}（control-plane|worker）")
+    if role == "worker":
+        allowed_kinds = WORKER_ALLOWED.get(args.cmd)
+        if args.cmd == "get" and args.kind in allowed_kinds:
+            pass  # 执行面允许：get pods
+        elif args.cmd == "logs":
+            pass
+        else:
+            die(f"执行面角色(worker)禁止命令: {args.cmd} {getattr(args, 'kind', '')} —— "
+                f"仅保留 get pods / logs（与任务执行无关的工具一律不保留）")
     args.func(args)
 
 
