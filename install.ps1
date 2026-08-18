@@ -1,5 +1,5 @@
 # dsh-routing-suite 一键安装（Windows PowerShell）
-# 步骤：1) 装配注入器  2) 安装 router-standard 预设  3) 提示重启
+# 步骤：1) 装配注入器  2) 安装 router-standard 预设  3) 提示重启  4) 可选 aikube 集群
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 
@@ -27,3 +27,7 @@ Write-Host '1. 重启 DSH（web 服务）' -ForegroundColor Yellow
 Write-Host '2. GUI 新建会话 → 选择 Router Standard (experimental)' -ForegroundColor Yellow
 Write-Host '3. 发任务：生成任务自动 react，维护任务自动 spec，模糊任务进 weak 内路由' -ForegroundColor Yellow
 Write-Host '4. AI 自优化工具：dev_router_status / dev_router_mode / dev_mode_subagent' -ForegroundColor Yellow
+
+Write-Host '=== [可选] AI K8s 集群调度网络（aikube）===' -ForegroundColor Cyan
+Write-Host '在 Linux/WSL/macOS 上执行：bash cluster/scripts/install.sh && aikube cluster init --name demo' -ForegroundColor Yellow
+Write-Host '详见 cluster/README.md（含一键演示 cluster/scripts/demo.sh）' -ForegroundColor Yellow

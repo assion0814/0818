@@ -1,14 +1,15 @@
-# dsh-routing-suite — 注入器 × 思维模式路由 套装
+# dsh-routing-suite — 注入器 × 思维模式路由 × AI 集群调度 套装
 
-一个仓库装齐「运行时手术台 + 思维模式路由预设」：先装注入器（免重启运行时管理层），
-再用它装配 router-standard 预设（任务感知思维模式路由，P1-P23 实测）。
+一个仓库装齐「运行时手术台 + 思维模式路由预设 + AI K8s 集群调度网络」：先装注入器
+（免重启运行时管理层），再用它装配 router-standard 预设（任务感知思维模式路由，P1-P23
+实测），最后可选搭建 aikube 集群（把 k8s 集群架构复刻为 AI 调度网络，P1-P3 实测）。
 
 [中文](README.md) | [English](README.en.md)
 
 ## 安装链（三步）
 
 ```powershell
-# 1. 拉套装（含两个 submodule）
+# 1. 拉套装（含 submodule）
 git clone --recurse-submodules https://github.com/yjh051108/dsh-routing-suite.git
 cd dsh-routing-suite
 
@@ -27,6 +28,11 @@ $target = Join-Path $env:USERPROFILE '.dsh\.agent-presets\router-standard'
 Copy-Item -Recurse .\preset\preset $target
 
 # 步骤 3：重启 DSH → 新会话选择 Router Standard (experimental)
+
+# 步骤 4（可选）：搭建 AI K8s 集群调度网络（跨平台，需要 Python 3.9+）
+bash cluster/scripts/install.sh
+aikube cluster init --name demo
+aikube run "设计一个微服务架构上线方案"    # 自动分类路由到 Pro 节点
 ```
 
 ## 组件
@@ -35,10 +41,13 @@ Copy-Item -Recurse .\preset\preset $target
 |---|---|---|---|
 | `injector/` | [dsh-super-injector](https://github.com/yjh051108/dsh-super-injector) | [v0.3.3](https://github.com/yjh051108/dsh-super-injector/releases/tag/v0.3.3) | 运行时注入器：dev_* 工具全家桶（注入/热重载/侧挂转正/卸载/路由自愈） |
 | `preset/` | [dsh-router-standard](https://github.com/yjh051108/dsh-router-standard) | [v0.3.0](https://github.com/yjh051108/dsh-router-standard/releases/tag/v0.3.0) | 思维模式路由预设：router-standard（RL 接口还原）/ router-spec（深度思考优先）/ router-pro（Pro 测量最优） |
+| `cluster/` | 本仓库内（可独立演进） | v0.1.0 | AI K8s 集群调度网络：ai-apiserver/ai-etcd/ai-scheduler/ai-controller/ai-kubelet + aikube CLI，纯 Python 标准库 |
 
-> 版本号以各组件仓库的 git tag 为准（列内链接直达对应 Release）。
+> 前两个组件版本号以各组件仓库的 git tag 为准（列内链接直达对应 Release）；
+> `cluster/` 为套装内置组件，README 见 [cluster/README.md](cluster/README.md)。
 
-两个组件独立演进（submodule 指向各自 main），套装聚合安装链与总览。
+injector 与 preset 独立演进（submodule 指向各自 main），cluster 聚合在同一仓库内，
+三者共用「任务感知路由」思想：preset 在会话内路由思维模式，cluster 在集群内路由任务。
 
 ## router-standard 预设能力（P1-P23 实测摘要）
 
@@ -53,6 +62,9 @@ Copy-Item -Recurse .\preset\preset $target
 
 - 注入器引导（规范铁律 10 条）：`injector/README.md`
 - 路由预设论文与实验：`preset/docs/paper.md` + `preset/docs/experiments.md`（P1-P23）
+- AI 集群组件：`cluster/README.md` + `cluster/docs/architecture.md`（K8s 映射）
+  + `cluster/docs/paper.md`（调度算法）+ `cluster/docs/experiments.md`（P1-P3）
+- 一键演示：`bash cluster/scripts/demo.sh`
 
 ## 许可证
 
