@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dsh-testkit" tests="13" failures="0" skipped="2" time="408.852">
+  <testcase classname="dsh.lifecycle" name="resolve" time="10.072"/>
+  <testcase classname="dsh.lifecycle" name="install-dsh" time="388.950"/>
+  <testcase classname="dsh.lifecycle" name="package" time="0.282"/>
+  <testcase classname="dsh.lifecycle" name="install-plugin" time="1.382"/>
+  <testcase classname="dsh.lifecycle" name="assemble" time="0.114"/>
+  <testcase classname="dsh.lifecycle" name="boot" time="6.725"/>
+  <testcase classname="dsh.lifecycle" name="register" time="0.000"/>
+  <testcase classname="dsh.lifecycle" name="exercise" time="0.000"/>
+  <testcase classname="dsh.lifecycle" name="update" time="0.000">
+    <skipped message="no updateFrom source"/>
+  </testcase>
+  <testcase classname="dsh.lifecycle" name="uninstall" time="0.376"/>
+  <testcase classname="dsh.lifecycle" name="reboot" time="0.951"/>
+  <testcase classname="dsh.lifecycle" name="recover" time="0.000">
+    <skipped message="no recovery was required"/>
+  </testcase>
+  <testcase classname="dsh.lifecycle" name="cleanup" time="0.000"/>
+</testsuite>

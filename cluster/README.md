@@ -81,6 +81,18 @@ python3 -m aikube cluster start
 - 调度算法论文（Filter/Score/Bind 数学定义）：[docs/paper.md](docs/paper.md)
 - 实测记录（P1-P3 全绿）：[docs/experiments.md](docs/experiments.md)
 
+## DSH Testkit 真实宿主门禁（已通过 ✅）
+
+cluster 组件以原生 DSH 插件形态（[plugin/](plugin/)）通过
+[DSH Testkit](https://github.com/iiwish/dsh-testkit)（
+[deepseek-harness discussion #2038](https://github.com/deepseek-ai/deepseek-harness/discussions/2038)）
+的真实宿主生命周期测试：在精确 DSH `0.1.0-rc.6` 中完成 install → boot → register
+（service `aikubeCluster` + tool `aikube`）→ exercise（真实拉起 1 主 2 从集群、
+spec/react 任务全部 Succeeded）→ uninstall → reboot → cleanup，**verdict passed**。
+
+- 门禁场景与复现：[plugin/README.md](plugin/README.md)
+- 完整证据（report.json/md + junit + probe）：[plugin/evidence/](plugin/evidence/)
+
 ## 测试
 
 ```bash

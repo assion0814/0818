@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "name": "aikube-cluster",
+  "suite": "quick",
+  "subject": {
+    "source": "/home/assion/dsh-routing-suite/cluster/plugin"
+  },
+  "dsh": {
+    "version": "0.1.0-rc.6"
+  },
+  "profile": "dsh-testkit",
+  "expect": {
+    "boot": "success",
+    "rows": [
+      "aikube"
+    ],
+    "services": [
+      "aikubeCluster"
+    ],
+    "tools": [
+      "aikube"
+    ]
+  },
+  "exercise": [
+    {
+      "tool": "aikube",
+      "arguments": {
+        "action": "smoke"
+      }
+    }
+  ],
+  "recovery": {
+    "onBootFailure": "remove-plugin"
+  },
+  "observers": {
+    "filesystem": "required",
+    "process": "preferred",
+    "ports": "preferred",
+    "network": "off",
+    "canary": "preferred"
+  },
+  "timeouts": {
+    "installMs": 900000,
+    "bootMs": 60000,
+    "cleanupMs": 30000
+  }
+}
