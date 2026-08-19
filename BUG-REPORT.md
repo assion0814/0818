@@ -54,23 +54,30 @@ pin `eff787e9` 与 HEAD × router-standard/router-spec × bootstrap/bootstrap-v1
 
 - 本仓库 `preset/`（vendor 修复副本，见下）
 - 本机已安装预设 `~/.dsh/.agent-presets/router-standard/`（bootstrap + bootstrap-v1）
+- 本机备份副本 `~/.dsh/scratch/web-profile-backup-20260816/agent-presets-router-standard.bak/`
+  （全盘扫描确认无其他副本）
 
 ## 推送路径说明（0818 的坑）
 
 `assion0814/0818` 原 `preset/` 是 **submodule 指针**（指向
 `yjh051108/dsh-router-standard` @ `eff787e9`），0818 仓库本身不含这些文件。
-上游 `yjh051108/dsh-router-standard` 对账号 `assion0814` **无写权限**（实测
-`ERROR: Permission to yjh051108/dsh-router-standard.git denied`），且无 GitHub
-token 无法走 fork+PR，因此采用既定备选路径：
 
-> **vendor 修复副本**：`preset/` 由 submodule 改为仓库内直接存放文件
-> （eff787e9 树 + extractText 修复），0818 单仓库即可携带修复。
+### 决策记录（2026-08-19）：不再尝试推送上游
 
-如后续获得上游写权限，正确链条为：
+对 `yjh051108/dsh-router-standard` **无上游写权限**（实测
+`ERROR: Permission to yjh051108/dsh-router-standard.git denied`，且无 GitHub
+token 无法走 fork+PR）。**已确认：修复只写入环境与 0818 交付仓库，不再尝试推送上游。**
+
+落地方式：
+1. **vendor 修复副本**：`preset/` 由 submodule 改为仓库内直接存放文件
+   （eff787e9 树 + extractText 修复），0818 单仓库即可携带修复（commit `bf77a64`）。
+2. **环境内全部副本已修复**：活动预设、备份副本（全盘扫描验证）。
+
+如未来获得上游写权限，恢复 submodule 形态的步骤：
 1. `git apply fix-extractText-import.patch` → commit → push 到
    `yjh051108/dsh-router-standard`，记下新 SHA
 2. 回本仓库：`git -C preset checkout <新SHA>` → `git add preset` → commit → push
-   （bump 子模块指针，届时可恢复 submodule 形态）
+   （bump 子模块指针）
 
 ## 建议 commit message
 
