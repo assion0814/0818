@@ -1,6 +1,6 @@
 {
   "name": "dsh-aikube",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "DSH plugin wrapper for the aikube AI k8s cluster scheduling network (dsh-routing-suite/cluster). Registers an 'aikube' tool that boots a real 1-master-2-node AI cluster, schedules tasks and reports status.",
   "type": "module",
   "main": "index.js",

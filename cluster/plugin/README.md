@@ -16,9 +16,42 @@ resolve → install-dsh → package → install-plugin → assemble → boot
 |---|---|
 | `package.json` | npm 包 + `dsh.bundle.patch` 声明 |
 | `cordis.patch.yml` | bundle 行插入：`id: aikube` |
-| `index.js` | 注册 service `aikubeCluster` + tool `aikube` |
+| `index.js` | 注册 service `aikubeCluster` + tool `aikube`（10 动作） |
 | `python/` | 打包的 aikube Python 引擎（`sync-python.sh` 从 `../aikube` 同步） |
 | `dsh-testkit.yaml` | Testkit 场景：quick suite，exercise 调用 `aikube {action: smoke}` |
+
+## tool `aikube` 动作面（控制面工具，共 10 个）
+
+| 动作 | 参数 | 说明 |
+|---|---|---|
+| `init` | — | 幂等启动集群（未初始化则 init，已初始化则 start） |
+| `start` / `stop` | — | 集群启停 |
+| `run` | text, mode, tools | 提交任务（AI 分类路由 + 工具授权） |
+| `get` | kind(nodes/pods/tasks/tools) | 查询（tools 显示控制面 API 面 + 节点白名单矩阵） |
+| `describe` | pod | 调度决策 + 工具授权 + 越权留痕 |
+| `logs` | pod | 任务执行输出 |
+| `status` | — | 插件能力信息 |
+| `smoke` | — | 全链路确定性测试（Testkit exercise） |
+
+## 安装与设为会话模式
+
+```bash
+# 1. 安装插件到 DSH profile（与套装 injector 同一安装链）
+dsh plugin --profile web add /home/assion/dsh-routing-suite/cluster/plugin
+
+# 2. 安装 aikube 调度预设（会话模式）+ 设为默认
+mkdir -p ~/.dsh/.agent-presets/aikube
+cp preset/preset.yml preset/agent.cordis.yml ~/.dsh/.agent-presets/aikube/
+#   并把 ~/.dsh/settings.yaml 的 agent-presets.default 改为 aikube
+
+# 3. 重启 DSH web 服务 → 新会话即使用「AI 集群调度 (aikube)」模式
+```
+
+> 预设文件随插件仓库分发：`cluster/plugin/preset/`（preset.yml + agent.cordis.yml）。
+
+> 预设说明：控制面 persona 只使用 `aikube` 工具（不保留与任务执行无关的工具），
+> 任务一律交给集群调度执行；执行面工具授权由集群调度器按任务需求下发，
+> 节点 ToolSandbox 拒绝越权并留痕。
 
 ## exercise 语义（确定性、无模型）
 
@@ -41,10 +74,9 @@ pnpm dsh-test --config dsh-testkit.yaml
 # 产物：.dsh-testkit/runs/<run>/report.{json,md} + junit.xml + 阶段证据
 ```
 
-本机实测（2026-08-18）：**verdict passed** 两轮——
-`20260818161052-5d9eb334`（v0.1.0 基线）与 `20260818165208-998d550f`（工具最小权限版：
-控制面 API 面无执行端点 + 节点工具白名单 + 调度器工具覆盖过滤 + ToolSandbox 越权拒绝）。
-完整证据见 [evidence/](evidence/)。
+本机实测（2026-08-19）：**verdict passed** 三轮——
+`20260818161052-5d9eb334`（v0.1.0 基线）、`20260818165208-998d550f`（工具最小权限版）、
+`20260819002902-8a866ed3`（v0.1.1：10 动作 + 端口互斥修复）。完整证据见 [evidence/](evidence/)。
 
 实测踩坑（复现时注意）：
 1. **镜像源**：本机 Docker 的 USTC mirror 已失效 → 改用官方支持的 local runner：

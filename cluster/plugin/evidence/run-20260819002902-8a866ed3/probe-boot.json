@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-19T00:30:58.449Z",
+  "mode": "present",
+  "services": {
+    "aikubeCluster": true
+  },
+  "tools": [
+    "aikube",
+    "job_output",
+    "job_list",
+    "job_kill",
+    "skill",
+    "web_search",
+    "glob",
+    "grep",
+    "str_replace_editor",
+    "read",
+    "write",
+    "edit",
+    "exit_plan_mode",
+    "todo_write",
+    "read_image",
+    "send_message",
+    "interrupt_agent",
+    "list_agents",
+    "get_goal",
+    "create_goal",
+    "update_goal",
+    "workflow",
+    "ralph",
+    "subagent",
+    "subagent_fork",
+    "bash"
+  ],
+  "skills": [],
+  "assertions": [
+    {
+      "id": "service.aikubeCluster",
+      "status": "passed",
+      "message": "aikubeCluster service is registered",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "id": "tool.aikube",
+      "status": "passed",
+      "message": "aikube tool is registered",
+      "expected": true,
+      "actual": true
+    }
+  ],
+  "exercises": [
+    {
+      "id": "exercise.aikube.1",
+      "status": "passed",
+      "message": "Tool aikube completed",
+      "expected": false,
+      "actual": false
+    }
+  ]
+}

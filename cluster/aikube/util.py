@@ -41,9 +41,17 @@ def logs_dir() -> Path:
     return d
 
 
-def free_port(preferred: int, base: int = 16000, span: int = 500) -> int:
-    """在 preferred 被占用时，从 base 起找空闲端口。"""
+def free_port(preferred: int, base: int = 16000, span: int = 500,
+              exclude: set[int] | None = None) -> int:
+    """在 preferred 被占用时，从 base 起找空闲端口。
+
+    exclude：必须避开的端口集合（如集群内其他组件已占用的端口），
+    防止 etcd/apiserver 回退到同一端口段时解析出相同端口（bind 竞争崩溃）。
+    """
+    excluded = exclude or set()
     for p in [preferred, *range(base, base + span)]:
+        if p in excluded:
+            continue
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             try:

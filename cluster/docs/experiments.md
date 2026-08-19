@@ -88,6 +88,22 @@ k8s-node2    [mock-pro  ] code_exec, file_read, file_write, math_calc, web_fetch
 tools_allowed 为空（模式推导集未批准）——改为 `requested ∪ decision.tools_required`
 后修复；运行时同步改为尝试已批准集，pods 表 TOOLS 列可见真实授权。
 
+缺陷记录（P6 门禁回归发现）：`cluster init` 的 etcd/apiserver 端口各自独立
+`free_port` 解析，当默认端口(12379/16443)被占用、双双回退到同一端口段时可能
+解析出**相同端口**（apiserver 检查时 etcd 尚未绑定）→ apiserver bind 失败崩溃
+→ 调度链路 404。修复：`free_port(preferred, base, exclude=...)` 端口互斥解析
+（etcd 先解析，apiserver 显式排除该端口），并补单测 `test_port_exclusion`。
+
+## P6 插件 10 动作 + 会话模式（门禁再次通过）✅
+
+- dsh-aikube 工具动作面扩展为 10 个：init/start/stop（幂等集群生命周期）、
+  run（提交任务）、get（nodes/pods/tasks/tools）、describe/logs、status、smoke。
+- 真实调度动作操作默认集群状态目录（~/.aikube，AIKUBE_HOME 可覆盖）。
+- 会话模式：`~/.dsh/.agent-presets/aikube` 预设（persona 只使用 aikube 工具，
+  任务一律交集群调度），`settings.yaml → agent-presets.default: aikube`。
+- DSH Testkit 门禁再次 passed（run `20260819002521-1ddbe620`）：
+  11 阶段全绿，exercise 含端口互斥修复后的真实集群调度。
+
 ## 复现
 
 ```bash

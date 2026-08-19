@@ -1,0 +1,2 @@
+name: AI 集群调度 (aikube)
+description: 任务经 AI K8s 集群调度网络调度 —— 控制面仅保留 aikube 管理工具；任务由集群 AI 调度器分类（spec/react/mixed/weak）路由到能力匹配节点，执行面按工具最小权限执行。

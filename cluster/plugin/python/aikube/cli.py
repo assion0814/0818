@@ -148,12 +148,16 @@ def cmd_cluster_init(args: argparse.Namespace) -> None:
             "slots": 2, "labels": {}, "runtime": "mock"}))
         prof["model"] = args.model_of.get(n, prof.get("model", "mock-flash"))
         nodes[n] = prof
+    # 端口互斥解析：etcd 与 apiserver 回退到同一端口段时绝不取同一端口
+    etcd_port = free_port(DEFAULT_PORTS["etcd"], base=args.port_base)
+    apiserver_port = free_port(DEFAULT_PORTS["apiserver"], base=args.port_base,
+                               exclude={etcd_port})
     conf = {
         "name": args.name,
         "created": time.time(),
         "token": token,
-        "etcd": {"port": free_port(DEFAULT_PORTS["etcd"], base=args.port_base)},
-        "apiserver": {"port": free_port(DEFAULT_PORTS["apiserver"], base=args.port_base)},
+        "etcd": {"port": etcd_port},
+        "apiserver": {"port": apiserver_port},
         "llm_url": args.llm_url,
         "llm_model": args.llm_model,
         "nodes": nodes,

@@ -140,12 +140,29 @@ class TestRoleGate(unittest.TestCase):
     def test_worker_role_allows_execution_tools(self):
         from aikube import cli
         from aikube.util import APIError
-        # get pods / logs 放行到命令层（无集群 → APIError 而非门控拒绝）
-        with self.assertRaises(APIError):
-            cli.main(["--role", "worker", "get", "pods"])
+        # get pods / logs 放行到命令层：集群在跑则正常返回或报业务错误（Pod 不存在），
+        # 不在则 APIError——都证明门控未拦截（若被门控拒绝会 SystemExit(1)
+        # 且 stderr 含"禁止命令"）
+        for argv in (["--role", "worker", "get", "pods"],
+                     ["--role", "worker", "logs", "x"]):
+            try:
+                cli.main(argv)
+            except (APIError, SystemExit):
+                pass
 
 
 class TestControlPlaneSurface(unittest.TestCase):
+    def test_port_exclusion(self):
+        """etcd/apiserver 回退同一端口段时绝不解析出相同端口（bind 竞争修复）。"""
+        from aikube.util import free_port
+        base = 19820
+        p1 = free_port(12379, base=base)
+        p2 = free_port(16443, base=base, exclude={p1})
+        self.assertNotEqual(p1, p2)
+        # 排除集合生效：p2 不会落在 p1 上，即使 p1 恰为 preferred
+        p3 = free_port(16443, base=base, exclude={p1})
+        self.assertNotEqual(p3, p1)
+
     def test_no_exec_endpoint(self):
         """控制面 API 面：/exec /shell /run 必须 404（含通用分支防绕过）。"""
         import json

@@ -1,0 +1,494 @@
+{
+  "schemaVersion": 1,
+  "runId": "20260819002902-8a866ed3",
+  "startedAt": "2026-08-19T00:29:02.154Z",
+  "endedAt": "2026-08-19T00:31:00.474Z",
+  "verdict": "passed",
+  "subject": {
+    "input": "/home/assion/dsh-routing-suite/cluster/plugin",
+    "kind": "local-directory",
+    "packageName": "dsh-aikube",
+    "packageVersion": "0.1.1",
+    "sourceDigest": "sha256:73949dd5096103151fe5553c3029e1b541aaa1a170019eab6301d4fba638ebc0",
+    "gitCommit": null,
+    "mutable": false
+  },
+  "dsh": {
+    "version": "0.1.0-rc.6",
+    "integrity": "sha256:9fbadbc72a258cf136d7883c688969eba212d1a505950f8234384a6da1cb1d52"
+  },
+  "scenario": {
+    "name": "aikube-cluster",
+    "suite": "quick",
+    "schemaVersion": 1,
+    "profile": "dsh-testkit",
+    "digest": "sha256:24226144c54b046cf3670219a457aa2dc6f854d4d74b8086062c62d559ca7373"
+  },
+  "testkitVersion": "0.3.1",
+  "environment": {
+    "runner": "local",
+    "isolation": "unsafe-local",
+    "unsafeLocal": true,
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v22.23.2",
+    "pnpm": "unavailable",
+    "image": null,
+    "imageId": null
+  },
+  "observerCoverage": {
+    "filesystem": {
+      "available": true,
+      "mode": "owned-root snapshots",
+      "limitations": [
+        "Changes outside the disposable run root are not observed"
+      ]
+    },
+    "process": {
+      "available": true,
+      "mode": "ps checkpoint",
+      "limitations": [
+        "Short-lived processes between checkpoints may be missed",
+        "Local checkpoints share the host process and network namespaces"
+      ]
+    },
+    "ports": {
+      "available": true,
+      "mode": "listening-port checkpoint",
+      "limitations": [
+        "Short-lived listeners between checkpoints may be missed",
+        "Local checkpoints share the host process and network namespaces"
+      ]
+    },
+    "network": {
+      "available": false,
+      "mode": "unavailable",
+      "limitations": [
+        "v0.1 does not include a network namespace trace or proxy observer"
+      ]
+    },
+    "canary": {
+      "available": true,
+      "mode": "raw-stream sentinel detection with sanitized persistence",
+      "limitations": [
+        "Absence from process output does not prove absence of egress"
+      ]
+    }
+  },
+  "stages": [
+    {
+      "id": "resolve",
+      "status": "passed",
+      "startedAt": "2026-08-19T00:29:02.154Z",
+      "endedAt": "2026-08-19T00:29:12.220Z",
+      "durationMs": 10066,
+      "summary": "Resolved local-directory source",
+      "assertions": [
+        {
+          "id": "source.reproducible",
+          "status": "passed",
+          "message": "Source resolves to an immutable run input",
+          "expected": "immutable source",
+          "actual": "immutable source"
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": "install-dsh",
+      "status": "passed",
+      "startedAt": "2026-08-19T00:29:12.220Z",
+      "endedAt": "2026-08-19T00:30:49.997Z",
+      "durationMs": 97777,
+      "summary": "Installed exact DSH 0.1.0-rc.6",
+      "command": [
+        "pnpm",
+        "add",
+        "--save-exact",
+        "@deepseek-ai/dsh@0.1.0-rc.6"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "assertions": [
+        {
+          "id": "dsh.version.exact",
+          "status": "passed",
+          "message": "Installed DSH 0.1.0-rc.6",
+          "expected": "0.1.0-rc.6",
+          "actual": "0.1.0-rc.6"
+        }
+      ],
+      "artifacts": [
+        "logs/install-dsh.stdout.log",
+        "logs/install-dsh.stderr.log"
+      ]
+    },
+    {
+      "id": "package",
+      "status": "passed",
+      "startedAt": "2026-08-19T00:30:49.998Z",
+      "endedAt": "2026-08-19T00:30:50.288Z",
+      "durationMs": 290,
+      "summary": "Packed dsh-aikube@0.1.1",
+      "assertions": [
+        {
+          "id": "subject.pack.digest",
+          "status": "passed",
+          "message": "Published tarball candidate has a content digest",
+          "actual": "sha256:73949dd5096103151fe5553c3029e1b541aaa1a170019eab6301d4fba638ebc0"
+        }
+      ],
+      "artifacts": [
+        "evidence/subject.json"
+      ]
+    },
+    {
+      "id": "install-plugin",
+      "status": "passed",
+      "startedAt": "2026-08-19T00:30:50.288Z",
+      "endedAt": "2026-08-19T00:30:51.667Z",
+      "durationMs": 1379,
+      "summary": "Installed dsh-aikube@0.1.1 into profile dsh-testkit",
+      "command": [
+        "/home/assion/dsh-routing-suite/cluster/.dsh-testkit-out/.owned-run-root/harness/node_modules/.bin/dsh",
+        "plugin",
+        "--profile",
+        "dsh-testkit",
+        "add",
+        "/home/assion/dsh-routing-suite/cluster/.dsh-testkit-out/.owned-run-root/packages/dsh-aikube-0.1.1.tgz",
+        "--save-exact"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "assertions": [
+        {
+          "id": "install.manifest.dependency",
+          "status": "passed",
+          "message": "Plugin dependency is pinned in the profile manifest",
+          "expected": "dsh-aikube",
+          "actual": "file:/home/assion/dsh-routing-suite/cluster/.dsh-testkit-out/.owned-run-root/packages/dsh-aikube-0.1.1.tgz"
+        },
+        {
+          "id": "install.manifest.bundle",
+          "status": "passed",
+          "message": "Plugin bundle is active in the profile",
+          "expected": "dsh-aikube",
+          "actual": [
+            "@deepseek-ai/dsh-base",
+            "dsh-aikube"
+          ]
+        }
+      ],
+      "artifacts": [
+        "logs/baseline-package.stdout.log",
+        "logs/baseline-package.stderr.log",
+        "logs/baseline-install.stdout.log",
+        "logs/baseline-install.stderr.log",
+        "logs/baseline-remove.stdout.log",
+        "logs/baseline-remove.stderr.log",
+        "logs/install-plugin.stdout.log",
+        "logs/install-plugin.stderr.log",
+        "evidence/filesystem-before-install.json",
+        "evidence/filesystem-before-boot.json"
+      ]
+    },
+    {
+      "id": "assemble",
+      "status": "passed",
+      "startedAt": "2026-08-19T00:30:51.667Z",
+      "endedAt": "2026-08-19T00:30:51.778Z",
+      "durationMs": 111,
+      "summary": "Composed profile with 79 addressable rows",
+      "command": [
+        "/home/assion/dsh-routing-suite/cluster/.dsh-testkit-out/.owned-run-root/harness/node_modules/.bin/dsh",
+        "--profile",
+        "dsh-testkit",
+        "--dump-config"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "assertions": [
+        {
+          "id": "config.row.aikube",
+          "status": "passed",
+          "message": "Configuration row aikube is present",
+          "expected": true,
+          "actual": true,
+          "evidence": [
+            "evidence/effective-config.yml"
+          ]
+        }
+      ],
+      "artifacts": [
+        "logs/assemble.stdout.log",
+        "logs/assemble.stderr.log",
+        "evidence/effective-config.yml"
+      ]
+    },
+    {
+      "id": "boot",
+      "status": "passed",
+      "startedAt": "2026-08-19T00:30:51.778Z",
+      "endedAt": "2026-08-19T00:30:58.548Z",
+      "durationMs": 6770,
+      "summary": "DSH reached the boot runtime probe",
+      "command": [
+        "/home/assion/dsh-routing-suite/cluster/.dsh-testkit-out/.owned-run-root/harness/node_modules/.bin/dsh",
+        "--profile",
+        "dsh-testkit",
+        "--patch",
+        "/home/assion/dsh-routing-suite/cluster/.dsh-testkit-out/.owned-run-root/probe.patch.yml"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "assertions": [
+        {
+          "id": "boot.outcome",
+          "status": "passed",
+          "message": "Observed expected boot success",
+          "expected": "success",
+          "actual": "success"
+        }
+      ],
+      "artifacts": [
+        "logs/boot.stdout.log",
+        "logs/boot.stderr.log",
+        "evidence/probe-boot.json"
+      ]
+    },
+    {
+      "id": "register",
+      "status": "passed",
+      "startedAt": "2026-08-19T00:30:58.548Z",
+      "endedAt": "2026-08-19T00:30:58.548Z",
+      "durationMs": 0,
+      "summary": "2 runtime registration assertion(s) passed",
+      "assertions": [
+        {
+          "id": "service.aikubeCluster",
+          "status": "passed",
+          "message": "aikubeCluster service is registered",
+          "expected": true,
+          "actual": true
+        },
+        {
+          "id": "tool.aikube",
+          "status": "passed",
+          "message": "aikube tool is registered",
+          "expected": true,
+          "actual": true
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": "exercise",
+      "status": "passed",
+      "startedAt": "2026-08-19T00:30:58.548Z",
+      "endedAt": "2026-08-19T00:30:58.549Z",
+      "durationMs": 1,
+      "summary": "1 deterministic tool exercise(s) passed",
+      "assertions": [
+        {
+          "id": "exercise.aikube.1",
+          "status": "passed",
+          "message": "Tool aikube completed",
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "artifacts": []
+    },
+    {
+      "id": "update",
+      "status": "skipped",
+      "startedAt": "2026-08-19T00:30:58.549Z",
+      "endedAt": "2026-08-19T00:30:58.549Z",
+      "durationMs": 0,
+      "summary": "no updateFrom source",
+      "assertions": [],
+      "artifacts": []
+    },
+    {
+      "id": "uninstall",
+      "status": "passed",
+      "startedAt": "2026-08-19T00:30:58.549Z",
+      "endedAt": "2026-08-19T00:30:58.931Z",
+      "durationMs": 382,
+      "summary": "Removed dsh-aikube from the profile",
+      "command": [
+        "/home/assion/dsh-routing-suite/cluster/.dsh-testkit-out/.owned-run-root/harness/node_modules/.bin/dsh",
+        "plugin",
+        "--profile",
+        "dsh-testkit",
+        "remove",
+        "dsh-aikube"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "assertions": [
+        {
+          "id": "uninstall.manifest.dependency",
+          "status": "passed",
+          "message": "Plugin dependency was removed",
+          "expected": false,
+          "actual": false
+        },
+        {
+          "id": "uninstall.manifest.bundle",
+          "status": "passed",
+          "message": "Plugin bundle was removed from the profile",
+          "expected": false,
+          "actual": false
+        },
+        {
+          "id": "uninstall.package.files",
+          "status": "passed",
+          "message": "Plugin package files were removed",
+          "expected": false,
+          "actual": false
+        },
+        {
+          "id": "uninstall.filesystem.residue",
+          "status": "passed",
+          "message": "No unexplained files remain after uninstall",
+          "expected": [],
+          "actual": [],
+          "evidence": [
+            "evidence/filesystem-after-uninstall.json"
+          ]
+        }
+      ],
+      "artifacts": [
+        "logs/uninstall.stdout.log",
+        "logs/uninstall.stderr.log",
+        "evidence/filesystem-after-uninstall.json"
+      ]
+    },
+    {
+      "id": "reboot",
+      "status": "passed",
+      "startedAt": "2026-08-19T00:30:58.931Z",
+      "endedAt": "2026-08-19T00:30:59.888Z",
+      "durationMs": 957,
+      "summary": "Profile rebooted without the plugin",
+      "command": [
+        "/home/assion/dsh-routing-suite/cluster/.dsh-testkit-out/.owned-run-root/harness/node_modules/.bin/dsh",
+        "--profile",
+        "dsh-testkit",
+        "--patch",
+        "/home/assion/dsh-routing-suite/cluster/.dsh-testkit-out/.owned-run-root/probe.patch.yml"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "assertions": [
+        {
+          "id": "service.aikubeCluster",
+          "status": "passed",
+          "message": "aikubeCluster service is absent",
+          "expected": false,
+          "actual": false
+        },
+        {
+          "id": "tool.aikube",
+          "status": "passed",
+          "message": "aikube tool is absent",
+          "expected": false,
+          "actual": false
+        }
+      ],
+      "artifacts": [
+        "logs/reboot.stdout.log",
+        "logs/reboot.stderr.log",
+        "evidence/probe-reboot.json"
+      ]
+    },
+    {
+      "id": "recover",
+      "status": "skipped",
+      "startedAt": "2026-08-19T00:30:59.888Z",
+      "endedAt": "2026-08-19T00:30:59.888Z",
+      "durationMs": 0,
+      "summary": "no recovery was required",
+      "assertions": [],
+      "artifacts": []
+    },
+    {
+      "id": "cleanup",
+      "status": "passed",
+      "startedAt": "2026-08-19T00:31:00.474Z",
+      "endedAt": "2026-08-19T00:31:00.474Z",
+      "durationMs": 0,
+      "summary": "Removed the owned run root and retained evidence",
+      "assertions": [
+        {
+          "id": "cleanup.owned-root.removed",
+          "status": "passed",
+          "message": "Owned run root was removed",
+          "expected": true,
+          "actual": true,
+          "evidence": [
+            "evidence/owned-root-final.json"
+          ]
+        },
+        {
+          "id": "canary.log-leak",
+          "status": "passed",
+          "message": "Canary value did not appear in command logs",
+          "expected": [],
+          "actual": []
+        }
+      ],
+      "artifacts": [
+        "evidence/owned-root-final.json"
+      ]
+    }
+  ],
+  "artifacts": [
+    "evidence/effective-config.yml",
+    "evidence/filesystem-after-uninstall.json",
+    "evidence/filesystem-before-boot.json",
+    "evidence/filesystem-before-install.json",
+    "evidence/owned-root-final.json",
+    "evidence/ports-boot.txt",
+    "evidence/ports-cleanup.txt",
+    "evidence/ports-initialize.txt",
+    "evidence/ports-reboot.txt",
+    "evidence/probe-boot.json",
+    "evidence/probe-reboot.json",
+    "evidence/process-boot.txt",
+    "evidence/process-cleanup.txt",
+    "evidence/process-initialize.txt",
+    "evidence/process-reboot.txt",
+    "evidence/scenario.json",
+    "evidence/subject.json",
+    "junit.xml",
+    "logs/assemble.stderr.log",
+    "logs/assemble.stdout.log",
+    "logs/baseline-install.stderr.log",
+    "logs/baseline-install.stdout.log",
+    "logs/baseline-package.stderr.log",
+    "logs/baseline-package.stdout.log",
+    "logs/baseline-remove.stderr.log",
+    "logs/baseline-remove.stdout.log",
+    "logs/boot.stderr.log",
+    "logs/boot.stdout.log",
+    "logs/install-dsh.stderr.log",
+    "logs/install-dsh.stdout.log",
+    "logs/install-plugin.stderr.log",
+    "logs/install-plugin.stdout.log",
+    "logs/local-worker.stderr.log",
+    "logs/local-worker.stdout.log",
+    "logs/package-primary.stderr.log",
+    "logs/package-primary.stdout.log",
+    "logs/reboot.stderr.log",
+    "logs/reboot.stdout.log",
+    "logs/toolchain-pnpm.stderr.log",
+    "logs/toolchain-pnpm.stdout.log",
+    "logs/uninstall.stderr.log",
+    "logs/uninstall.stdout.log",
+    "report.json",
+    "report.md"
+  ],
+  "reproductionCommand": "dsh-test --dsh 0.1.0-rc.6 --runner local --suite quick --unsafe-local --config dsh-testkit.yaml"
+}

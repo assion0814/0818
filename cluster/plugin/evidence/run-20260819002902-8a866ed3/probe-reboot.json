@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-08-19T00:30:59.806Z",
+  "mode": "absent",
+  "services": {
+    "aikubeCluster": false
+  },
+  "tools": [
+    "job_output",
+    "job_list",
+    "job_kill",
+    "skill",
+    "web_search",
+    "glob",
+    "grep",
+    "str_replace_editor",
+    "read",
+    "write",
+    "edit",
+    "exit_plan_mode",
+    "todo_write",
+    "read_image",
+    "send_message",
+    "interrupt_agent",
+    "list_agents",
+    "get_goal",
+    "create_goal",
+    "update_goal",
+    "workflow",
+    "ralph",
+    "subagent",
+    "subagent_fork",
+    "bash"
+  ],
+  "skills": [],
+  "assertions": [
+    {
+      "id": "service.aikubeCluster",
+      "status": "passed",
+      "message": "aikubeCluster service is absent",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "id": "tool.aikube",
+      "status": "passed",
+      "message": "aikube tool is absent",
+      "expected": false,
+      "actual": false
+    }
+  ],
+  "exercises": []
+}

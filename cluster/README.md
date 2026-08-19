@@ -125,4 +125,27 @@ bash cluster/scripts/install.sh              # 软链 aikube 到 ~/.local/bin
 bash cluster/scripts/demo.sh                 # 一键演示：起集群+跑任务+故障自愈
 ```
 
+## 设为 DSH 会话模式（AI 集群调度）
+
+让 DSH 会话把任务交给本集群调度网络执行（控制面只保留 aikube 工具）：
+
+```bash
+# 1. 安装 dsh-aikube 插件到 profile（与套装 injector 同一安装链）
+dsh plugin --profile web add cluster/plugin
+
+# 2. 安装「AI 集群调度 (aikube)」预设并设为默认模式
+mkdir -p ~/.dsh/.agent-presets/aikube
+cp cluster/plugin/preset/preset.yml cluster/plugin/preset/agent.cordis.yml ~/.dsh/.agent-presets/aikube/
+#   编辑 ~/.dsh/settings.yaml：agent-presets.default: aikube
+
+# 3. 启动集群（或让会话内 agent 调用 aikube action=init）
+aikube cluster init --name dsh --nodes k8s-node1 k8s-node2
+
+# 4. 重启 DSH web 服务 → 新会话即使用「AI 集群调度 (aikube)」模式
+```
+
+会话内 agent 的调度工作流（由预设 persona 固化）：
+`aikube action=run text="任务"` → `action=get kind=pods` 轮询 → `action=logs pod=...` 取结果；
+集群未启动时 `action=init`（幂等）。预设文件见 `cluster/plugin/preset/`。
+
 MIT License。
