@@ -1,0 +1,370 @@
+{
+  "tool": "eval-trajectory",
+  "judge_model": "qwen2.5:1.5b",
+  "llm_url": "http://127.0.0.1:11434/v1",
+  "scenarios": [
+    {
+      "name": "N-spec",
+      "text": "设计一个微服务架构上线方案",
+      "meta": {
+        "pod": "task-67095b4d-01",
+        "node": "k8s-master",
+        "mode": "spec",
+        "phase": "Succeeded",
+        "reschedule": 0
+      },
+      "score": {
+        "logic": 8,
+        "efficiency": 8,
+        "correctness": 8,
+        "tool_selection": 8,
+        "overall": 8,
+        "reason": "任务轨迹合理，工具使用正确，逻辑和效率均符合要求，没有发现越权调用或不合理的决策链。"
+      },
+      "trajectory": [
+        {
+          "step": 1,
+          "action": "ai-classify",
+          "detail": "null"
+        },
+        {
+          "step": 2,
+          "action": "ai-schedule",
+          "detail": "winner=k8s-master, tools_required=['file_read', 'file_write', 'math_calc'], tools_allowed=['file_read', 'file_write', 'math_calc']"
+        },
+        {
+          "step": 3,
+          "action": "tool.file_read",
+          "detail": "allowed=True, result=文件不存在: notes.txt"
+        },
+        {
+          "step": 4,
+          "action": "tool.file_write",
+          "detail": "allowed=True, result=写入成功: notes.txt (9 字符)"
+        },
+        {
+          "step": 5,
+          "action": "tool.math_calc",
+          "detail": "allowed=True, result=计算 2+3*4 = 14"
+        },
+        {
+          "step": 6,
+          "action": "controller",
+          "detail": "bind -> k8s-master, tools=['file_read', 'file_write', 'math_calc']"
+        }
+      ]
+    },
+    {
+      "name": "N-react",
+      "text": "修复登录页面的 bug",
+      "meta": {
+        "pod": "task-8f7dbdd9-01",
+        "node": "k8s-node1",
+        "mode": "react",
+        "phase": "Succeeded",
+        "reschedule": 0
+      },
+      "score": {
+        "logic": 10,
+        "efficiency": 10,
+        "correctness": 10,
+        "tool_selection": 10,
+        "overall": 10,
+        "reason": "任务轨迹完全按照预期逻辑执行，每个步骤都符合分类、路由和工具授权的要求。工具使用合理，没有越权调用，且所有步骤都成功完成，最终输出结果符合预期。"
+      },
+      "trajectory": [
+        {
+          "step": 1,
+          "action": "ai-classify",
+          "detail": "null"
+        },
+        {
+          "step": 2,
+          "action": "ai-schedule",
+          "detail": "winner=k8s-node1, tools_required=['code_exec', 'web_fetch', 'math_calc'], tools_allowed=['code_exec', 'math_calc', 'web_fetch']"
+        },
+        {
+          "step": 3,
+          "action": "tool.code_exec",
+          "detail": "allowed=True, result=代码执行(模拟): print('ok') → 输出 ok"
+        },
+        {
+          "step": 4,
+          "action": "tool.math_calc",
+          "detail": "allowed=True, result=计算 2+3*4 = 14"
+        },
+        {
+          "step": 5,
+          "action": "tool.web_fetch",
+          "detail": "allowed=True, result=网页(模拟): https://example.com/docs 抓取成功, 2 个段落"
+        },
+        {
+          "step": 6,
+          "action": "controller",
+          "detail": "bind -> k8s-node1, tools=['code_exec', 'math_calc', 'web_fetch']"
+        }
+      ]
+    },
+    {
+      "name": "N-mixed",
+      "text": "开发一个小游戏然后修复其中的 bug",
+      "meta": {
+        "pod": "task-2d8136cf-01",
+        "node": "k8s-node2",
+        "mode": "mixed",
+        "phase": "Succeeded",
+        "reschedule": 0
+      },
+      "score": {
+        "logic": 8,
+        "efficiency": 9,
+        "correctness": 9,
+        "tool_selection": 9,
+        "overall": 9,
+        "reason": "任务轨迹合理，效率高，正确分类和执行，工具选择恰当，未发现越权调用。"
+      },
+      "trajectory": [
+        {
+          "step": 1,
+          "action": "ai-classify",
+          "detail": "null"
+        },
+        {
+          "step": 2,
+          "action": "ai-schedule",
+          "detail": "winner=k8s-node2, tools_required=['file_read', 'file_write', 'code_exec', 'math_calc'], tools_allowed=['code_exec', 'file_read', 'file_write', 'math_calc']"
+        },
+        {
+          "step": 3,
+          "action": "tool.code_exec",
+          "detail": "allowed=True, result=代码执行(模拟): print('ok') → 输出 ok"
+        },
+        {
+          "step": 4,
+          "action": "tool.file_read",
+          "detail": "allowed=True, result=文件不存在: notes.txt"
+        },
+        {
+          "step": 5,
+          "action": "tool.file_write",
+          "detail": "allowed=True, result=写入成功: notes.txt (9 字符)"
+        },
+        {
+          "step": 6,
+          "action": "tool.math_calc",
+          "detail": "allowed=True, result=计算 2+3*4 = 14"
+        },
+        {
+          "step": 7,
+          "action": "controller",
+          "detail": "bind -> k8s-node2, tools=['code_exec', 'file_read', 'file_write', 'math_calc']"
+        }
+      ]
+    },
+    {
+      "name": "N-weak",
+      "text": "这个报错是什么意思？",
+      "meta": {
+        "pod": "task-1e00d205-01",
+        "node": "k8s-node1",
+        "mode": "weak",
+        "phase": "Succeeded",
+        "reschedule": 0
+      },
+      "score": {
+        "logic": 8,
+        "efficiency": 7,
+        "correctness": 9,
+        "tool_selection": 8,
+        "overall": 8,
+        "reason": "任务轨迹合理，效率高，正确分类和执行，工具选择恰当，越权调用被正确拒绝。"
+      },
+      "trajectory": [
+        {
+          "step": 1,
+          "action": "ai-classify",
+          "detail": "null"
+        },
+        {
+          "step": 2,
+          "action": "ai-schedule",
+          "detail": "winner=k8s-node1, tools_required=['classify_text', 'summarize_text'], tools_allowed=['classify_text', 'summarize_text']"
+        },
+        {
+          "step": 3,
+          "action": "tool.classify_text",
+          "detail": "allowed=True, result=分类: weak (置信 0.6)"
+        },
+        {
+          "step": 4,
+          "action": "tool.summarize_text",
+          "detail": "allowed=True, result=摘要: 这个报错是什么意思？"
+        },
+        {
+          "step": 5,
+          "action": "controller",
+          "detail": "bind -> k8s-node1, tools=['classify_text', 'summarize_text']"
+        }
+      ]
+    },
+    {
+      "name": "A-react-extra-tool",
+      "text": "react 任务越权请求 file_write",
+      "meta": {
+        "pod": "task-9eec1f6b-01",
+        "node": "k8s-node1",
+        "mode": "react",
+        "phase": "Succeeded",
+        "reschedule": 0
+      },
+      "score": {
+        "logic": 7,
+        "efficiency": 7,
+        "correctness": 7,
+        "tool_selection": 7,
+        "overall": 7,
+        "reason": "任务轨迹合理，所有步骤都符合逻辑，工具使用符合权限，任务分类和执行正确，但没有提供足够的理由来评估工具选择的合理性。"
+      },
+      "trajectory": [
+        {
+          "step": 1,
+          "action": "ai-classify",
+          "detail": "null"
+        },
+        {
+          "step": 2,
+          "action": "ai-schedule",
+          "detail": "winner=k8s-node1, tools_required=['file_write', 'code_exec'], tools_allowed=None"
+        },
+        {
+          "step": 3,
+          "action": "tool.code_exec",
+          "detail": "allowed=True, result=代码执行(模拟): print('ok') → 输出 ok"
+        },
+        {
+          "step": 4,
+          "action": "tool.file_write",
+          "detail": "allowed=False, result=拒绝: 工具不在本任务白名单"
+        },
+        {
+          "step": 5,
+          "action": "controller",
+          "detail": "bind -> k8s-node1, tools=['code_exec']"
+        }
+      ]
+    },
+    {
+      "name": "A-spec-code-exec",
+      "text": "spec 任务显式请求 code_exec",
+      "meta": {
+        "pod": "task-7b43a49f-01",
+        "node": "k8s-node2",
+        "mode": "spec",
+        "phase": "Succeeded",
+        "reschedule": 0
+      },
+      "score": {
+        "logic": 10,
+        "efficiency": 10,
+        "correctness": 10,
+        "tool_selection": 10,
+        "overall": 10,
+        "reason": "任务轨迹完全按照预期逻辑执行，每个步骤都符合分类、路由、工具授权和执行的顺序。工具使用符合最小权限原则，没有越权调用。任务分类、路由和执行过程完全正确，最终输出结果符合预期。"
+      },
+      "trajectory": [
+        {
+          "step": 1,
+          "action": "ai-classify",
+          "detail": "null"
+        },
+        {
+          "step": 2,
+          "action": "ai-schedule",
+          "detail": "winner=k8s-node2, tools_required=['code_exec'], tools_allowed=['code_exec']"
+        },
+        {
+          "step": 3,
+          "action": "tool.code_exec",
+          "detail": "allowed=True, result=代码执行(模拟): print('ok') → 输出 ok"
+        },
+        {
+          "step": 4,
+          "action": "controller",
+          "detail": "bind -> k8s-node2, tools=['code_exec']"
+        }
+      ]
+    },
+    {
+      "name": "F-kill-node",
+      "text": "运行中 kill k8s-node2 kubelet",
+      "meta": {
+        "pod": "task-2780f9ce-01",
+        "node": "k8s-node2",
+        "mode": "spec",
+        "phase": "Succeeded",
+        "reschedule": 1
+      },
+      "score": {
+        "logic": 7,
+        "efficiency": 7,
+        "correctness": 7,
+        "tool_selection": 7,
+        "overall": 7,
+        "reason": "任务轨迹合理，遵循了分类、路由、工具授权和执行的逻辑顺序。所有步骤都以最少必要步骤和工具完成，工具权限被遵守，任务被正确分类和路由到能力匹配的节点，最终成功完成。工具选择和越权调用均被正确拒绝。"
+      },
+      "trajectory": [
+        {
+          "step": 1,
+          "action": "ai-classify",
+          "detail": "null"
+        },
+        {
+          "step": 2,
+          "action": "ai-schedule",
+          "detail": "winner=k8s-node2, tools_required=['file_read', 'file_write', 'math_calc'], tools_allowed=['file_read', 'file_write', 'math_calc']"
+        },
+        {
+          "step": 3,
+          "action": "tool.file_read",
+          "detail": "allowed=True, result=文件不存在: notes.txt"
+        },
+        {
+          "step": 4,
+          "action": "tool.file_write",
+          "detail": "allowed=True, result=写入成功: notes.txt (9 字符)"
+        },
+        {
+          "step": 5,
+          "action": "tool.math_calc",
+          "detail": "allowed=True, result=计算 2+3*4 = 14"
+        },
+        {
+          "step": 6,
+          "action": "controller",
+          "detail": "bind -> k8s-master, tools=['file_read', 'file_write', 'math_calc']"
+        },
+        {
+          "step": 7,
+          "action": "controller",
+          "detail": "evict: 节点 NotReady"
+        },
+        {
+          "step": 8,
+          "action": "controller",
+          "detail": "requeue -> Pending"
+        },
+        {
+          "step": 9,
+          "action": "controller",
+          "detail": "bind -> k8s-node2, tools=['file_read', 'file_write', 'math_calc']"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "scored": 7,
+    "avg_overall": 8.43,
+    "min_overall": 7
+  }
+}

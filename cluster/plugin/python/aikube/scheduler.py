@@ -119,8 +119,8 @@ class Scheduler:
         return scheduled
 
     def _schedule_pod(self, pod: dict) -> bool:
-        # 1. AI 分类（mode=auto 时）
-        if pod["mode"] == "auto" or not pod.get("classification"):
+        # 1. AI 分类（仅 mode=auto 时；显式模式必须保留）
+        if pod["mode"] == "auto":
             cls = self.classifier.classify(pod.get("text", ""))
             pod["mode"] = cls["mode"]
             pod["classification"] = cls

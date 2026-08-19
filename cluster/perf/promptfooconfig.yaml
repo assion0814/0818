@@ -1,0 +1,40 @@
+# promptfoo 性能门禁配置：AI 集群调度网络 端到端延迟/正确性
+# 用法：
+#   cd cluster/perf
+#   npx promptfoo eval --config promptfooconfig.yaml --repeat 3 --output results.json
+#   python3 summary.py results.json   # 输出通过率 + 延迟 P50/P95
+prompts:
+  - '{{task}}'
+
+providers:
+  - id: './aikube-provider.mjs'
+    label: aikube-cluster
+
+tests:
+  - vars:
+      task: 设计一个微服务架构上线方案
+    assert:
+      - type: contains
+        value: SUCCEEDED
+      - type: javascript
+        value: output.includes('Succeeded')
+  - vars:
+      task: 修复登录页面的 bug
+    assert:
+      - type: contains
+        value: SUCCEEDED
+  - vars:
+      task: 把用户反馈整理成一份报告文档
+    assert:
+      - type: contains
+        value: SUCCEEDED
+  - vars:
+      task: 用 GPU 训练图像识别模型
+    assert:
+      - type: contains
+        value: SUCCEEDED
+  - vars:
+      task: 重构支付模块并输出完整实施方案
+    assert:
+      - type: contains
+        value: SUCCEEDED

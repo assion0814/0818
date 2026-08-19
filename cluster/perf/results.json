@@ -1,0 +1,1178 @@
+{
+  "evalId": "eval-uen-2026-08-19T04:22:40",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-08-19T04:22:40.041Z",
+    "prompts": [
+      {
+        "id": "ec1aefd522ceea4dbc16cd07da0dccd9fce23abef66cb24e561eb6956c67f536",
+        "raw": "{{task}}",
+        "label": "{{task}}",
+        "provider": "aikube-cluster",
+        "metrics": {
+          "score": 10,
+          "testPassCount": 10,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 12,
+          "assertFailCount": 0,
+          "totalLatencyMs": 34538,
+          "tokenUsage": {
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "total": 0,
+            "numRequests": 10,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "namedScores": {},
+          "namedScoresCount": {},
+          "namedScoreWeights": {},
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "SUCCEEDED"
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "javascript",
+                "value": "output.includes('Succeeded')"
+              }
+            }
+          ]
+        },
+        "id": "e13ebc7b-aaf1-44f9-a50f-307d2436a90c",
+        "latencyMs": 3353,
+        "namedScores": {},
+        "prompt": {
+          "raw": "设计一个微服务架构上线方案",
+          "label": "{{task}}",
+          "config": {}
+        },
+        "promptId": "ec1aefd522ceea4dbc16cd07da0dccd9fce23abef66cb24e561eb6956c67f536",
+        "promptIdx": 0,
+        "provider": {
+          "id": "aikube-cluster",
+          "label": "aikube-cluster"
+        },
+        "response": {
+          "output": "SUCCEEDED: task-afd223cf-01 task-afd223cf spec k8s-master Succeeded",
+          "latencyMs": 3353
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "task": "设计一个微服务架构上线方案"
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "SUCCEEDED"
+            },
+            {
+              "type": "javascript",
+              "value": "output.includes('Succeeded')"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "task": "设计一个微服务架构上线方案"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "SUCCEEDED"
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "javascript",
+                "value": "output.includes('Succeeded')"
+              }
+            }
+          ]
+        },
+        "id": "72245397-747d-4a66-a7d5-b0b4315e6f55",
+        "latencyMs": 2285,
+        "namedScores": {},
+        "prompt": {
+          "raw": "设计一个微服务架构上线方案",
+          "label": "{{task}}",
+          "config": {}
+        },
+        "promptId": "ec1aefd522ceea4dbc16cd07da0dccd9fce23abef66cb24e561eb6956c67f536",
+        "promptIdx": 0,
+        "provider": {
+          "id": "aikube-cluster",
+          "label": "aikube-cluster"
+        },
+        "response": {
+          "output": "SUCCEEDED: task-5385175a-01 task-5385175a spec k8s-master Succeeded",
+          "latencyMs": 2285
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "task": "设计一个微服务架构上线方案"
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "SUCCEEDED"
+            },
+            {
+              "type": "javascript",
+              "value": "output.includes('Succeeded')"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "task": "设计一个微服务架构上线方案"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "SUCCEEDED"
+              }
+            }
+          ]
+        },
+        "id": "6f4fbe4a-a360-496c-9cc6-7747c061ef57",
+        "latencyMs": 2316,
+        "namedScores": {},
+        "prompt": {
+          "raw": "修复登录页面的 bug",
+          "label": "{{task}}",
+          "config": {}
+        },
+        "promptId": "ec1aefd522ceea4dbc16cd07da0dccd9fce23abef66cb24e561eb6956c67f536",
+        "promptIdx": 0,
+        "provider": {
+          "id": "aikube-cluster",
+          "label": "aikube-cluster"
+        },
+        "response": {
+          "output": "SUCCEEDED: task-4774d2bc-01 task-4774d2bc react k8s-node1 Succeeded",
+          "latencyMs": 2316
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "task": "修复登录页面的 bug"
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "SUCCEEDED"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 2,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "task": "修复登录页面的 bug"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "SUCCEEDED"
+              }
+            }
+          ]
+        },
+        "id": "781780e8-1d0f-49d7-b121-b0cf15d02461",
+        "latencyMs": 3388,
+        "namedScores": {},
+        "prompt": {
+          "raw": "修复登录页面的 bug",
+          "label": "{{task}}",
+          "config": {}
+        },
+        "promptId": "ec1aefd522ceea4dbc16cd07da0dccd9fce23abef66cb24e561eb6956c67f536",
+        "promptIdx": 0,
+        "provider": {
+          "id": "aikube-cluster",
+          "label": "aikube-cluster"
+        },
+        "response": {
+          "output": "SUCCEEDED: task-5b7e76f3-01 task-5b7e76f3 react k8s-node1 Succeeded",
+          "latencyMs": 3388
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "task": "修复登录页面的 bug"
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "SUCCEEDED"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 3,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "task": "修复登录页面的 bug"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "SUCCEEDED"
+              }
+            }
+          ]
+        },
+        "id": "9e6cd84b-f075-463b-94fe-dc5a8e7a8cd6",
+        "latencyMs": 6540,
+        "namedScores": {},
+        "prompt": {
+          "raw": "把用户反馈整理成一份报告文档",
+          "label": "{{task}}",
+          "config": {}
+        },
+        "promptId": "ec1aefd522ceea4dbc16cd07da0dccd9fce23abef66cb24e561eb6956c67f536",
+        "promptIdx": 0,
+        "provider": {
+          "id": "aikube-cluster",
+          "label": "aikube-cluster"
+        },
+        "response": {
+          "output": "SUCCEEDED: task-84c33330-01 task-84c33330 react k8s-node1 Succeeded",
+          "latencyMs": 6540
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "task": "把用户反馈整理成一份报告文档"
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "SUCCEEDED"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 4,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "task": "把用户反馈整理成一份报告文档"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "SUCCEEDED"
+              }
+            }
+          ]
+        },
+        "id": "39212997-f6fa-418c-8a59-e3e849dc48de",
+        "latencyMs": 5468,
+        "namedScores": {},
+        "prompt": {
+          "raw": "把用户反馈整理成一份报告文档",
+          "label": "{{task}}",
+          "config": {}
+        },
+        "promptId": "ec1aefd522ceea4dbc16cd07da0dccd9fce23abef66cb24e561eb6956c67f536",
+        "promptIdx": 0,
+        "provider": {
+          "id": "aikube-cluster",
+          "label": "aikube-cluster"
+        },
+        "response": {
+          "output": "SUCCEEDED: task-567a5196-01 task-567a5196 react k8s-node1 Succeeded",
+          "latencyMs": 5468
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "task": "把用户反馈整理成一份报告文档"
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "SUCCEEDED"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 5,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "task": "把用户反馈整理成一份报告文档"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "SUCCEEDED"
+              }
+            }
+          ]
+        },
+        "id": "08f7564c-63e2-497a-9a45-0144a9077925",
+        "latencyMs": 3342,
+        "namedScores": {},
+        "prompt": {
+          "raw": "用 GPU 训练图像识别模型",
+          "label": "{{task}}",
+          "config": {}
+        },
+        "promptId": "ec1aefd522ceea4dbc16cd07da0dccd9fce23abef66cb24e561eb6956c67f536",
+        "promptIdx": 0,
+        "provider": {
+          "id": "aikube-cluster",
+          "label": "aikube-cluster"
+        },
+        "response": {
+          "output": "SUCCEEDED: task-43b9b04c-01 task-43b9b04c react k8s-node1 Succeeded",
+          "latencyMs": 3342
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "task": "用 GPU 训练图像识别模型"
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "SUCCEEDED"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 6,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "task": "用 GPU 训练图像识别模型"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "SUCCEEDED"
+              }
+            }
+          ]
+        },
+        "id": "32afd005-ca64-4bc3-b18a-882ae709667e",
+        "latencyMs": 2273,
+        "namedScores": {},
+        "prompt": {
+          "raw": "用 GPU 训练图像识别模型",
+          "label": "{{task}}",
+          "config": {}
+        },
+        "promptId": "ec1aefd522ceea4dbc16cd07da0dccd9fce23abef66cb24e561eb6956c67f536",
+        "promptIdx": 0,
+        "provider": {
+          "id": "aikube-cluster",
+          "label": "aikube-cluster"
+        },
+        "response": {
+          "output": "SUCCEEDED: task-09a5015b-01 task-09a5015b react k8s-node1 Succeeded",
+          "latencyMs": 2273
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "task": "用 GPU 训练图像识别模型"
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "SUCCEEDED"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 7,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "task": "用 GPU 训练图像识别模型"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "SUCCEEDED"
+              }
+            }
+          ]
+        },
+        "id": "b10589f5-2db5-406f-85ee-7e16be777d70",
+        "latencyMs": 2255,
+        "namedScores": {},
+        "prompt": {
+          "raw": "重构支付模块并输出完整实施方案",
+          "label": "{{task}}",
+          "config": {}
+        },
+        "promptId": "ec1aefd522ceea4dbc16cd07da0dccd9fce23abef66cb24e561eb6956c67f536",
+        "promptIdx": 0,
+        "provider": {
+          "id": "aikube-cluster",
+          "label": "aikube-cluster"
+        },
+        "response": {
+          "output": "SUCCEEDED: task-3a38a8e0-01 task-3a38a8e0 spec k8s-node2 Succeeded",
+          "latencyMs": 2255
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "task": "重构支付模块并输出完整实施方案"
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "SUCCEEDED"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 8,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "task": "重构支付模块并输出完整实施方案"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "contains",
+                "value": "SUCCEEDED"
+              }
+            }
+          ]
+        },
+        "id": "b4f245ca-9a79-4b17-9c20-04596d16995c",
+        "latencyMs": 3318,
+        "namedScores": {},
+        "prompt": {
+          "raw": "重构支付模块并输出完整实施方案",
+          "label": "{{task}}",
+          "config": {}
+        },
+        "promptId": "ec1aefd522ceea4dbc16cd07da0dccd9fce23abef66cb24e561eb6956c67f536",
+        "promptIdx": 0,
+        "provider": {
+          "id": "aikube-cluster",
+          "label": "aikube-cluster"
+        },
+        "response": {
+          "output": "SUCCEEDED: task-57da441d-01 task-57da441d spec k8s-node2 Succeeded",
+          "latencyMs": 3318
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "task": "重构支付模块并输出完整实施方案"
+          },
+          "assert": [
+            {
+              "type": "contains",
+              "value": "SUCCEEDED"
+            }
+          ],
+          "options": {},
+          "metadata": {}
+        },
+        "testIdx": 9,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "task": "重构支付模块并输出完整实施方案"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 10,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 10,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "durationMs": 10076,
+      "evaluationDurationMs": 10076
+    }
+  },
+  "config": {
+    "tags": {},
+    "prompts": [
+      "{{task}}"
+    ],
+    "providers": [
+      {
+        "id": "./aikube-provider.mjs",
+        "label": "aikube-cluster"
+      }
+    ],
+    "tests": [
+      {
+        "vars": {
+          "task": "设计一个微服务架构上线方案"
+        },
+        "assert": [
+          {
+            "type": "contains",
+            "value": "SUCCEEDED"
+          },
+          {
+            "type": "javascript",
+            "value": "output.includes('Succeeded')"
+          }
+        ]
+      },
+      {
+        "vars": {
+          "task": "修复登录页面的 bug"
+        },
+        "assert": [
+          {
+            "type": "contains",
+            "value": "SUCCEEDED"
+          }
+        ]
+      },
+      {
+        "vars": {
+          "task": "把用户反馈整理成一份报告文档"
+        },
+        "assert": [
+          {
+            "type": "contains",
+            "value": "SUCCEEDED"
+          }
+        ]
+      },
+      {
+        "vars": {
+          "task": "用 GPU 训练图像识别模型"
+        },
+        "assert": [
+          {
+            "type": "contains",
+            "value": "SUCCEEDED"
+          }
+        ]
+      },
+      {
+        "vars": {
+          "task": "重构支付模块并输出完整实施方案"
+        },
+        "assert": [
+          {
+            "type": "contains",
+            "value": "SUCCEEDED"
+          }
+        ]
+      }
+    ],
+    "env": {},
+    "outputPath": [
+      "results.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.122.0",
+    "nodeVersion": "v22.23.2",
+    "platform": "linux",
+    "arch": "x64",
+    "exportedAt": "2026-08-19T04:22:50.169Z",
+    "evaluationCreatedAt": "2026-08-19T04:22:40.041Z"
+  },
+  "vars": [
+    "task"
+  ],
+  "runtimeOptions": {
+    "eventSource": "cli",
+    "showProgressBar": true,
+    "repeat": 2,
+    "maxConcurrency": 4,
+    "cache": true
+  }
+}

@@ -118,6 +118,18 @@ python3 -m unittest discover -s tests -v     # 18 个单元测试
 python3 -m unittest tests.test_e2e -v        # 3 个端到端（真实拉起集群）
 ```
 
+## 评测与性能门禁
+
+- **轨迹评估**（调度质量，LLM judge）：`python3 scripts/eval-trajectory.py`
+  —— 7 场景（4 模式正常 + 越权 + 故障自愈）逐步评分；报告见
+  [docs/eval/trajectory-eval.md](docs/eval/trajectory-eval.md)
+- **性能门禁**（promptfoo，端到端延迟 P50/P95）：
+  `cd perf && npx promptfoo eval --config promptfooconfig.yaml --repeat 10
+  --output results.json && python3 summary.py results.json`；
+  报告见 [docs/eval/perf-report.md](docs/eval/perf-report.md)
+- **进阶方案**（AgentBench 通用能力回归 / ToolEmu 安全对抗，含环境限制）：
+  [docs/eval/agentbench-toolemu-plan.md](docs/eval/agentbench-toolemu-plan.md)
+
 ## 安装（可选）
 
 ```bash
