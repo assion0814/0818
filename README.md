@@ -9,7 +9,7 @@
 ## 安装链（三步）
 
 ```powershell
-# 1. 拉套装（含 submodule）
+# 1. 拉套装（preset/cluster 在仓库内，injector 为 submodule）
 git clone --recurse-submodules https://github.com/yjh051108/dsh-routing-suite.git
 cd dsh-routing-suite
 
@@ -40,13 +40,16 @@ aikube run "设计一个微服务架构上线方案"    # 自动分类路由到 
 | 路径 | 仓库 | 版本 | 作用 |
 |---|---|---|---|
 | `injector/` | [dsh-super-injector](https://github.com/yjh051108/dsh-super-injector) | [v0.3.3](https://github.com/yjh051108/dsh-super-injector/releases/tag/v0.3.3) | 运行时注入器：dev_* 工具全家桶（注入/热重载/侧挂转正/卸载/路由自愈） |
-| `preset/` | [dsh-router-standard](https://github.com/yjh051108/dsh-router-standard) | [v0.3.0](https://github.com/yjh051108/dsh-router-standard/releases/tag/v0.3.0) | 思维模式路由预设：router-standard（RL 接口还原）/ router-spec（深度思考优先）/ router-pro（Pro 测量最优） |
-| `cluster/` | 本仓库内（可独立演进） | v0.1.0 | AI K8s 集群调度网络：ai-apiserver/ai-etcd/ai-scheduler/ai-controller/ai-kubelet + aikube CLI，纯 Python 标准库 |
+| `preset/` | vendor 副本（原 [dsh-router-standard](https://github.com/yjh051108/dsh-router-standard) @ eff787e9） | v0.3.0 + 修复 | 思维模式路由预设：router-standard / router-spec / router-pro；**已含 extractText 导入修复**（见 [BUG-REPORT.md](BUG-REPORT.md)） |
+| `cluster/` | 本仓库内（可独立演进） | v0.1.1 | AI K8s 集群调度网络：ai-apiserver/ai-etcd/ai-scheduler/ai-controller/ai-kubelet + aikube CLI，纯 Python 标准库 |
 
-> 前两个组件版本号以各组件仓库的 git tag 为准（列内链接直达对应 Release）；
-> `cluster/` 为套装内置组件，README 见 [cluster/README.md](cluster/README.md)。
+> `preset/` 因上游（yjh051108/dsh-router-standard）无写权限且修复急需落地，
+> 由 submodule 改为**仓库内直接存放**（vendor 修复副本：eff787e9 树 + extractText 修复，
+> 补丁见 [fix-extractText-import.patch](fix-extractText-import.patch)）。
+> 获得上游写权限后可恢复 submodule 形态（见 BUG-REPORT 推送路径说明）。
+> `injector/` 仍为 submodule（指向 dsh-super-injector main）。
 
-injector 与 preset 独立演进（submodule 指向各自 main），cluster 聚合在同一仓库内，
+injector 独立演进（submodule 指向其 main），preset 与 cluster 聚合在仓库内，
 三者共用「任务感知路由」思想：preset 在会话内路由思维模式，cluster 在集群内路由任务。
 
 ## router-standard 预设能力（P1-P23 实测摘要）

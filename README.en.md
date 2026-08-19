@@ -11,7 +11,7 @@ scheduling fabric: 1 control-plane + N nodes, pure Python stdlib).
 ## Install chain (three steps)
 
 ```powershell
-# 1. Clone the suite (includes submodules)
+# 1. Clone the suite (preset/cluster in-repo; injector as submodule)
 git clone --recurse-submodules https://github.com/yjh051108/dsh-routing-suite.git
 cd dsh-routing-suite
 
@@ -42,14 +42,18 @@ aikube run "Design a microservice rollout plan"   # auto-classified → routed t
 | Path | Repo | Version | Role |
 |---|---|---|---|
 | `injector/` | [dsh-super-injector](https://github.com/yjh051108/dsh-super-injector) | [v0.3.3](https://github.com/yjh051108/dsh-super-injector/releases/tag/v0.3.3) | Runtime injector: dev_* tool family (inject / hot-reload / staging-promote / uninject / route self-heal) |
-| `preset/` | [dsh-router-standard](https://github.com/yjh051108/dsh-router-standard) | [v0.3.0](https://github.com/yjh051108/dsh-router-standard/releases/tag/v0.3.0) | Reasoning-mode routing presets: router-standard (RL-interface restoration) / router-spec (deep-think-first) / router-pro (V4 Pro measured optimum) |
-| `cluster/` | in-repo (can be split out later) | v0.1.0 | AI k8s cluster scheduling network: ai-apiserver / ai-etcd / ai-scheduler / ai-controller / ai-kubelet + `aikube` CLI — pure Python stdlib |
+| `preset/` | vendored copy (orig. [dsh-router-standard](https://github.com/yjh051108/dsh-router-standard) @ eff787e9) | v0.3.0 + fix | Reasoning-mode routing presets: router-standard / router-spec / router-pro; **includes the extractText import fix** (see [BUG-REPORT.md](BUG-REPORT.md)) |
+| `cluster/` | in-repo (can be split out later) | v0.1.1 | AI k8s cluster scheduling network: ai-apiserver / ai-etcd / ai-scheduler / ai-controller / ai-kubelet + `aikube` CLI — pure Python stdlib |
 
-> The first two components evolve independently (submodules point at each repo's
-> `main`); `cluster/` lives inside the suite — see [cluster/README.md](cluster/README.md).
+> `preset/` was converted from a submodule into in-repo files (vendored fixed
+> copy: eff787e9 tree + extractText fix; patch: [fix-extractText-import.patch](fix-extractText-import.patch))
+> because upstream (yjh051108/dsh-router-standard) is not writable and the fix
+> needed to ship now. Restore the submodule form once upstream access exists
+> (see the push chain in BUG-REPORT.md). `injector/` remains a submodule.
 
-All three share the same "task-aware routing" idea: the presets route reasoning
-modes inside a session; the cluster routes tasks across nodes.
+`injector` evolves independently (submodule); `preset` and `cluster` live in
+this repo. All three share the same "task-aware routing" idea: the presets
+route reasoning modes inside a session; the cluster routes tasks across nodes.
 
 ## router-standard preset capabilities (P1–P23 measured summary)
 
@@ -70,7 +74,7 @@ modes inside a session; the cluster routes tasks across nodes.
 ## Docs
 
 - Injector guide (10 rules): `injector/README.md`
-- Routing preset paper & experiments: `preset/docs/paper.md` + `preset/docs/experiments.md` (P1–P23), `preset/docs/paper-pro.md` (V4 Pro)
+- Routing preset paper & experiments: `preset/docs/paper.md` + `preset/docs/experiments.md` (P1–P23)
 - AI cluster component: `cluster/README.md` + `cluster/docs/architecture.md` (k8s mapping)
   + `cluster/docs/paper.md` (scheduling algorithm) + `cluster/docs/experiments.md` (P1–P3)
 - One-shot demo: `bash cluster/scripts/demo.sh`

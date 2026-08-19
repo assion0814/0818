@@ -1,0 +1,52 @@
+diff --git a/preset/router-spec/router-bootstrap-v1.mjs b/preset/router-spec/router-bootstrap-v1.mjs
+index 6eaf1f4..aa99a28 100644
+--- a/preset/router-spec/router-bootstrap-v1.mjs
++++ b/preset/router-spec/router-bootstrap-v1.mjs
+@@ -20,7 +20,7 @@
+  */
+ 
+ import {
+-  applyPersona, bandFor, bandOf, coreFor, parseMode, personaFor, sessionMode, testinessFor, clamp01,
++  applyPersona, bandFor, bandOf, coreFor, extractText, parseMode, personaFor, sessionMode, testinessFor, clamp01,
+   isComplexTask,
+ } from './router-core.mjs'
+ 
+diff --git a/preset/router-spec/router-bootstrap.mjs b/preset/router-spec/router-bootstrap.mjs
+index 6eaf1f4..aa99a28 100644
+--- a/preset/router-spec/router-bootstrap.mjs
++++ b/preset/router-spec/router-bootstrap.mjs
+@@ -20,7 +20,7 @@
+  */
+ 
+ import {
+-  applyPersona, bandFor, bandOf, coreFor, parseMode, personaFor, sessionMode, testinessFor, clamp01,
++  applyPersona, bandFor, bandOf, coreFor, extractText, parseMode, personaFor, sessionMode, testinessFor, clamp01,
+   isComplexTask,
+ } from './router-core.mjs'
+ 
+diff --git a/preset/router-standard/router-bootstrap-v1.mjs b/preset/router-standard/router-bootstrap-v1.mjs
+index 6eaf1f4..aa99a28 100644
+--- a/preset/router-standard/router-bootstrap-v1.mjs
++++ b/preset/router-standard/router-bootstrap-v1.mjs
+@@ -20,7 +20,7 @@
+  */
+ 
+ import {
+-  applyPersona, bandFor, bandOf, coreFor, parseMode, personaFor, sessionMode, testinessFor, clamp01,
++  applyPersona, bandFor, bandOf, coreFor, extractText, parseMode, personaFor, sessionMode, testinessFor, clamp01,
+   isComplexTask,
+ } from './router-core.mjs'
+ 
+diff --git a/preset/router-standard/router-bootstrap.mjs b/preset/router-standard/router-bootstrap.mjs
+index 6eaf1f4..aa99a28 100644
+--- a/preset/router-standard/router-bootstrap.mjs
++++ b/preset/router-standard/router-bootstrap.mjs
+@@ -20,7 +20,7 @@
+  */
+ 
+ import {
+-  applyPersona, bandFor, bandOf, coreFor, parseMode, personaFor, sessionMode, testinessFor, clamp01,
++  applyPersona, bandFor, bandOf, coreFor, extractText, parseMode, personaFor, sessionMode, testinessFor, clamp01,
+   isComplexTask,
+ } from './router-core.mjs'
+ 
